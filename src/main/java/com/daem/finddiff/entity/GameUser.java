@@ -37,8 +37,7 @@ public class GameUser {
     /**
      * 该用户玩的游戏对应的序列号id
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @OneToOne
     private Serial serial;
 
 }

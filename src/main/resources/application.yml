@@ -11,9 +11,12 @@ spring:
     username: root
     password: 123456
 
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     database: mysql
+file:
+  path: E:/upload/
 

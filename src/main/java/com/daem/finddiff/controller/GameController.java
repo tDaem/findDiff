@@ -56,7 +56,7 @@ public class GameController {
      * @param game 需要更新的游戏实例
      * @return 如果删除成功，泛型中返回true，否则false
      */
-    @DeleteMapping(value = "/game", produces = "application/json;charset=UTF-8")
+    @PutMapping(value = "/game", produces = "application/json;charset=UTF-8")
     public ResponseResult<Boolean> updateGame(@RequestBody Game game) {
         return gameService.updateGame(game);
     }

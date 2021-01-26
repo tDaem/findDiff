@@ -35,19 +35,9 @@ public class Serial {
     @Column(nullable = false, unique = true)
     private String serial;
 
-    @OneToMany(mappedBy = "serial")
-    private List<GameUser> gameUsers;
-
-    /**
-     * 序列号的类型
-     * @see SerialType
-     */
-    @Column(nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    private SerialType serialType;
-
     /**
      * 此序列号游戏中的状态
+     *
      * @see SerialStatus
      */
     @Column(nullable = false)
