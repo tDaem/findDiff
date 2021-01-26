@@ -15,6 +15,6 @@ body {
     margin-top: 120px;
 }
 
-table tr td>* {
+table tr td > * {
     margin-top: 20px;
 }

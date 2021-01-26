@@ -3,8 +3,11 @@ package com.daem.finddiff.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @Description 登录的用户实体类
@@ -16,7 +19,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
-public class User {
+public class GameUser {
 
     /**
      * 主键 自增
@@ -37,4 +40,5 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Serial serial;
+
 }

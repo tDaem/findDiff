@@ -1,4 +1,4 @@
-package com.matrix.auth.dto;
+package com.daem.finddiff.dto;
 
 
 import lombok.Getter;
@@ -26,9 +26,9 @@ public class ResponseResult<T> {
     private String msg;
 
     /**
-     * http状态码
+     * 程序异常信息
      */
-    private int status;
+    private String errorMsg;
 
     /**
      * 返回的数据
@@ -77,6 +77,21 @@ public class ResponseResult<T> {
         ResponseResult<T> result = new ResponseResult<>();
         result.code = FAILED;
         result.msg = msg;
+        return result;
+    }
+
+    /**
+     *
+     * @param msg
+     * @param errorMsg
+     * @param <T>
+     * @return
+     */
+    public static <T> ResponseResult<T> defFailed(String msg, String errorMsg) {
+        ResponseResult<T> result = new ResponseResult<>();
+        result.code = FAILED;
+        result.msg = msg;
+        result.errorMsg = errorMsg;
         return result;
     }
 }

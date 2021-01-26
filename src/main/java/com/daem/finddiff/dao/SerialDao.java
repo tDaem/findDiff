@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
  * @Date 2021/1/26
  */
 @Repository
-public interface SerialMapper extends JpaRepository<Serial, Integer> {
+public interface SerialDao extends JpaRepository<Serial, Integer> {
 
     /**
      * 通过序列号找序列号实体类
      * @param serial 序列号字符串
      * @return 序列号实体类
      */
-    Serial findBySerial(String serial);
+    Serial findBySerial(String serial) throws Exception;
 
 }

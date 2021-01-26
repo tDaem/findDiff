@@ -21,7 +21,11 @@ function resize() {
     console.log('tableHeight=' + tableHeight)
     var offsetRight = 3 / 2 * (bodyWidth / 4 - tableWidth / 2)
     var offsetTop = (windowHeight / 2 - tableHeight / 2) / 2
-    $('div form').css({'position': 'relative', 'right': offsetRight, 'top': offsetTop})
+    $('div form').css({
+        'position': 'relative',
+        'right': offsetRight,
+        'top': offsetTop
+    })
     $('div p').css({
         'width': 2 / 3 * offsetRight,
         'position': 'relative',
