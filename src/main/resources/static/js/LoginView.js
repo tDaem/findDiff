@@ -22,8 +22,6 @@ LoginView.prototype.show = function () {
         .css(this.options).prependTo(this.box)
         .attr("id", "info")
 
-    $('#loginBtn').click(this.scene.loginBtnClickListener.bind(this))
-
     // 调用父类show方法
     View.prototype.show.call(this)
 }

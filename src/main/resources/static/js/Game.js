@@ -61,14 +61,14 @@ Game.prototype.loadLoginScene = function (layout) {//
     scene.load()
 }
 
-Game.prototype.loadStartScene = function (layout) {//
+Game.prototype.loadStartScene = function (prevScene, layout) {//
     if (layout && layout === 'TB') {
         $(this.box).css(this.TB)
     } else {
         $(this.box).css(this.LR)
     }
     var scene = new StartScene(this)//开始时的场景 有个默认参数src = 'images/0.jpg'  用new StartScene(this)初始化一个对象 将开始场景传入进去
-    scene.load()
+    scene.load(prevScene)
 }
 
 //加载下一张图片

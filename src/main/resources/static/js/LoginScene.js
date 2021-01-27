@@ -19,7 +19,7 @@ LoginScene.prototype.clickListener = function (x, y) {
 
 }
 
-LoginScene.prototype.loginBtnClickListener = function(){
+LoginScene.prototype.loginBtnClick = function () {
     var gameId = $('#id').val();
     var serialNum = $('#serial').val();
     console.log('gameId: ' + gameId)
@@ -51,7 +51,6 @@ LoginScene.prototype.loginBtnClickListener = function(){
     //发起请求时，占位空间按
     var loading = dialog({});
     loading.showModal()
-    var that = this
     //发起请求
     $.ajax({
         url: "/serial",
@@ -60,15 +59,15 @@ LoginScene.prototype.loginBtnClickListener = function(){
             serialNum: serialNum
         },
         dataType: 'json',
-        success: function (ret) {
+        success: ret => {
             loading.close().remove()
             console.log(ret)
             if (ret.code === 0 && ret.data) {
+                //序列号校验
                 //存在该序列号时进入相应的游戏
-                console.log(that)
-                that.remove()
-                that.scene.game.loadStartScene(this)
-                that.scene.unload()
+                console.log(this)
+                this.game.loadStartScene(this)
+
             } else {
                 //序列号输入错误时 弹出提示
                 var d = dialog({
@@ -80,7 +79,7 @@ LoginScene.prototype.loginBtnClickListener = function(){
                 }, 2000);
             }
         },
-        error: function (ret) {
+        error: ret => {
             loading.close().remove()
             console.log(ret)
             var d = dialog({
@@ -94,7 +93,7 @@ LoginScene.prototype.loginBtnClickListener = function(){
     });
 }
 
-// 重写场景加载方法，添加全屏按扭
+//
 LoginScene.prototype.load = function (prevScene) {
 
     this.loginView = new LoginView(this, {
@@ -107,13 +106,9 @@ LoginScene.prototype.load = function (prevScene) {
         borderRadius: '6px'
     })
 
-    this.fullScreen = new FullScreenButton(this.game.box, {
-        left: 'auto',
-        right: '20px',
-        zIndex: 9
-    })
     this.loginView.show()
-    this.fullScreen.show()
+
+    $('#loginBtn').click(this.loginBtnClick.bind(this))
 
     // 调用父类load方法
     Scene.prototype.load.call(this)
