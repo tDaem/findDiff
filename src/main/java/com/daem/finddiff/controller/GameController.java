@@ -51,7 +51,7 @@ public class GameController {
     }
 
     /**
-     * 删除游戏实例
+     * 更新游戏实例
      *
      * @param game 需要更新的游戏实例
      * @return 如果删除成功，泛型中返回true，否则false

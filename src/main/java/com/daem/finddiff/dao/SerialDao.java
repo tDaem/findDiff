@@ -17,6 +17,6 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
      * @param serial 序列号字符串
      * @return 序列号实体类
      */
-    Serial findBySerial(String serial) throws Exception;
+    Serial findBySerialNum(String serial) throws Exception;
 
 }

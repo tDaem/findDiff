@@ -33,16 +33,16 @@ public class Serial {
      * 序列号
      */
     @Column(nullable = false, unique = true)
-    private String serial;
+    private String serialNum;
 
     /**
-     * 此序列号游戏中的状态
+     * 此序列号游戏中的状态(默认为未开始)
      *
      * @see SerialStatus
      */
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    private SerialStatus serialStatus;
+    private SerialStatus serialStatus = SerialStatus.NOT_STARTED;
 
     /**
      * 多个序列号玩同一个游戏
