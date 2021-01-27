@@ -55,6 +55,7 @@ LoginScene.prototype.loginBtnClick = function () {
     $.ajax({
         url: "/serial",
         type: 'get',
+        timeout: 12000,
         data: {
             serialNum: serialNum
         },
@@ -82,13 +83,23 @@ LoginScene.prototype.loginBtnClick = function () {
         error: ret => {
             loading.close().remove()
             console.log(ret)
-            var d = dialog({
-                content: '服务器异常，请联系作者！'
-            });
-            d.show();
-            setTimeout(function () {
-                d.close().remove();
-            }, 2000);
+            if (ret.status == 'timeout'){
+                var d = dialog({
+                    content: '请求超时，请检查网络！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }else {
+                var d = dialog({
+                    content: '服务器异常，请联系作者！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
         }
     });
 }
