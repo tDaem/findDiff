@@ -21,10 +21,10 @@ public class GameService {
     private GameDao gameDao;
 
 
-    public ResponseResult<Boolean> saveGame(Game game) {
+    public ResponseResult<Game> saveGame(Game game) {
         try {
             Game game1 = gameDao.save(game);
-            return ResponseResult.defSuccessful(Objects.nonNull(game1));
+            return ResponseResult.defSuccessful(game1);
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
@@ -69,10 +69,10 @@ public class GameService {
      * @param game
      * @return
      */
-    public ResponseResult<Boolean> updateGame(Game game) {
+    public ResponseResult<Game> updateGame(Game game) {
         try {
             Game game1 = gameDao.save(game);
-            return ResponseResult.defSuccessful(Objects.nonNull(game1));
+            return ResponseResult.defSuccessful(game1);
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }

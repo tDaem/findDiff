@@ -28,6 +28,11 @@ Game.prototype.listen = function () {//获取点击的在盒子上的坐标（�
     }.bind(this))//将点击事件绑定在当前的场景上
 }
 
+Game.prototype.loadLoginScene = function () {//
+    var scene = new LoginScene(this)//登录场景
+    scene.load()
+}
+
 Game.prototype.loadStartScene = function () {//
     var scene = new StartScene(this)//开始时的场景 有个默认参数src = 'images/0.jpg'  用new StartScene(this)初始化一个对象 将开始场景传入进去
     scene.load()

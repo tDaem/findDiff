@@ -24,7 +24,7 @@ public class GameController {
      * @return 如果创建成功，泛型中返回true，否则false
      */
     @PostMapping(value = "/game", produces = "application/json;charset=UTF-8")
-    public ResponseResult<Boolean> createGame(@RequestBody Game game) {
+    public ResponseResult<Game> createGame(@RequestBody Game game) {
         return gameService.saveGame(game);
     }
 
@@ -57,7 +57,7 @@ public class GameController {
      * @return 如果删除成功，泛型中返回true，否则false
      */
     @PutMapping(value = "/game", produces = "application/json;charset=UTF-8")
-    public ResponseResult<Boolean> updateGame(@RequestBody Game game) {
+    public ResponseResult<Game> updateGame(@RequestBody Game game) {
         return gameService.updateGame(game);
     }
 }

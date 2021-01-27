@@ -29,7 +29,7 @@ public class SerialController {
      * @return
      */
     @PostMapping(value = "/serial", produces = "application/json;charset=UTF-8")
-    public ResponseResult<Boolean> createSerial(@RequestBody Serial serialNum){
+    public ResponseResult<Serial> createSerial(@RequestBody Serial serialNum){
         return serialService.createSerial(serialNum);
     }
 
@@ -51,7 +51,7 @@ public class SerialController {
      * @return 如果删除成功，泛型中返回true，否则false
      */
     @PutMapping(value = "/serial", produces = "application/json;charset=UTF-8")
-    public ResponseResult<Boolean> updateSerial(@RequestBody Serial serial) {
+    public ResponseResult<Serial> updateSerial(@RequestBody Serial serial) {
         return serialService.updateSerial(serial);
     }
 }
