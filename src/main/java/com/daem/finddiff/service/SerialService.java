@@ -33,6 +33,9 @@ public class SerialService {
 
     public ResponseResult<Boolean> createSerial(Serial serial) {
         try {
+            Serial bySerialNum = serialDao.findBySerialNum(serial.getSerialNum());
+            if (Objects.nonNull(bySerialNum))
+                return ResponseResult.defFailed("该序列号已存在！");
             Serial serial1 = serialDao.save(serial);
             return ResponseResult.defSuccessful(Objects.nonNull(serial1));
         } catch (Exception e) {

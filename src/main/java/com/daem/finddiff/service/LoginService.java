@@ -23,10 +23,10 @@ public class LoginService {
     @Autowired
     private UserDao userDao;
 
-    public ResponseResult<Boolean> login(String gameId, String serial) {
+    public ResponseResult<Boolean> login(String gameId, String serialNum) {
         Serial serialEntity = null;
         try {
-            serialEntity = serialDao.findBySerial(serial);
+            serialEntity = serialDao.findBySerialNum(serialNum);
             if (Objects.isNull(serialEntity)){
                 return ResponseResult.defFailed("游戏序列号不存在！");
             }

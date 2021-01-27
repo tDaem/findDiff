@@ -25,12 +25,12 @@ public class SerialController {
 
     /**
      * 新建一个序列号
-     * @param serial
+     * @param serialNum
      * @return
      */
     @PostMapping(value = "/serial", produces = "application/json;charset=UTF-8")
-    public ResponseResult<Boolean> createSerial(Serial serial){
-        return serialService.createSerial(serial);
+    public ResponseResult<Boolean> createSerial(@RequestBody Serial serialNum){
+        return serialService.createSerial(serialNum);
     }
 
     /**
