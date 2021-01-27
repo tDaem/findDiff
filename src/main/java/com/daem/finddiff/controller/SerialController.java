@@ -19,8 +19,8 @@ public class SerialController {
     private SerialService serialService;
 
     @GetMapping("/serial")
-    public ResponseResult<Serial> getSerialBySerial(String serial){
-        return serialService.getSerialBySerial(serial);
+    public ResponseResult<Serial> getSerialBySerial(String serialNum){
+        return serialService.getSerialBySerial(serialNum);
     }
 
     /**

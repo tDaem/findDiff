@@ -23,12 +23,6 @@ StartScene.prototype.clickListener = function(x, y){
 
 // 重写场景加载方法，添加全屏按扭
 StartScene.prototype.load = function(prevScene){
-    this.fullScreen = new FullScreenButton(this.game.box, {
-        left: 'auto',
-        right: '20px',
-    })
-    this.fullScreen.show()
-
     // 调用父类load方法
     Scene.prototype.load.call(this)
 }
