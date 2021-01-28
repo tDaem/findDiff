@@ -1,16 +1,20 @@
 package com.daem.finddiff.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.daem.finddiff.config.WebSocketEncoder;
+import com.daem.finddiff.dto.Message;
+import com.daem.finddiff.dto.ResponseResult;
+import com.daem.finddiff.entity.DiffsCoordinate;
 import com.daem.finddiff.service.RoomService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,13 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Author tyx
  * @Date 2021/1/27
  */
-@ServerEndpoint("/websocket/{roomNum}/{serialNum}")
+@ServerEndpoint(value = "/websocket/{roomNum}/{serialNum}",encoders = WebSocketEncoder.class/*,decoders = WebSocketDecoder.class*/)
 @Controller
 public class WebsocketController {
-
-    @Autowired
-    private RoomService roomService;
-
+    private Logger logger = LoggerFactory.getLogger(WebsocketController.class);
     private static int onlineCount = 0;
     // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static ConcurrentHashMap<String, Set<Session>> clients = new ConcurrentHashMap<>();
@@ -48,7 +49,8 @@ public class WebsocketController {
         rooms.get(roomNum).add(session);
 
         try {
-            broadcast(roomNum,"连接成功");
+            logger.info("web socket 连接成功！");
+            broadcast(roomNum, Message.TIP("连接成功！"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,8 +66,10 @@ public class WebsocketController {
         //移除该成员
         sessions.remove(session);
         //销毁房间
-        if (sessions.size() == 0)
-            roomService.destroyRoom(roomNum);
+        if (sessions.size() == 0){
+            logger.info("destroyRoom roomNum=" + roomNum);
+            RoomService.destroyRoom(roomNum);
+        }
 
         subOnlineCount();
     }
@@ -82,7 +86,8 @@ public class WebsocketController {
     public void onMessage(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, String message, Session session) throws IOException {
         try {
             //广播坐标
-            broadcast(roomNum, message);
+            logger.info("收到客户端的消息：" + message);
+            broadcast(roomNum, Message.DATA(message));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,11 +99,11 @@ public class WebsocketController {
      * @param roomNum
      * @param message
      */
-    private static void broadcast(int roomNum, String message) {
+    private static <T> void broadcast(int roomNum, ResponseResult<Message<T>> message) {
         for (Session session : RoomService.getRooms().get(roomNum)) {
             try {
-                session.getBasicRemote().sendText(message);
-            } catch (IOException e) {
+                session.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException e) {
                 e.printStackTrace();
             }
         }

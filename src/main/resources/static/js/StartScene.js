@@ -24,8 +24,9 @@ StartScene.prototype.clickListener = function (x, y) {
 }
 
 // 重写场景加载方法，添加全屏按扭
-StartScene.prototype.load = function (prevScene) {
-
+StartScene.prototype.load = function (prevScene, params) {
+    console.log(params)
+    this.params = params
     //全屏按钮
     this.fullScreen = new FullScreenButton(this.game.box, {
         left: 'auto',
@@ -71,64 +72,59 @@ StartScene.prototype.load = function (prevScene) {
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
     prevScene.loginView.remove()
-    prevScene.$ele.fadeOut(1500, function () {
-        console.log('start scene loaded')
-        prevScene.unload()
-    }.bind(this))
-}
-
-function doWebSocket(roomNum) {
-    var webSocket
+    prevScene.$ele.fadeOut(1500, () => {
+            console.log('start scene loaded')
+            prevScene.unload()
+            //获取房间号（无论单人或多人游戏）
+            var loading = dialog()
+            $.ajax({
+                url: "/room",
+                type: 'get',
+                timeout: 12000,
+                dataType: 'json',
+                success: ret => {
+                    loading.close().remove()
+                    console.log(ret)
+                    if (ret.code === 0 && ret.data) {
+                        this.params.roomNum = ret.data//保存房间号
+                    } else {
+                        var d = dialog({
+                            content: '进入游戏失败！'
+                        });
+                        d.show();
+                        setTimeout(function () {
+                            d.close().remove();
+                        }, 2000);
+                    }
+                },
+                error: ret => {
+                    loading.close().remove()
+                    console.log(ret)
+                    if (ret.status == 'timeout') {
+                        var d = dialog({
+                            content: '请求超时，请检查网络！'
+                        });
+                        d.show();
+                        setTimeout(function () {
+                            d.close().remove();
+                        }, 2000);
+                    } else {
+                        var d = dialog({
+                            content: '服务器异常！'
+                        });
+                        d.show();
+                        setTimeout(function () {
+                            d.close().remove();
+                        }, 2000);
+                    }
+                }
+            })
+        }
+    )
 }
 
 StartScene.prototype.soloGameBtnClick = function () {
-    //创建一个单人房间
-    var loading = dialog()
-    $.ajax({//创建房间
-        url: "/room",
-        type: 'get',
-        timeout: 12000,
-        dataType: 'json',
-        success: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.code === 0 && ret.data) {
-                var roomNum = ret.data
-                //建立长连接
-                doWebSocket(roomNum)
-            } else {
-                //序列号输入错误时 弹出提示
-                var d = dialog({
-                    content: '进入游戏失败！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
-            }
-        },
-        error: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.status == 'timeout'){
-                var d = dialog({
-                    content: '请求超时，请检查网络！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
-            }else {
-                var d = dialog({
-                    content: '服务器异常！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
-            }
-        }
-    })
+    this.game.loadGameScene(this, this.params)
 }
 
 StartScene.prototype.teamGameBtnClick = function () {

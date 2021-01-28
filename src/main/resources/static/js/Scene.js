@@ -4,6 +4,7 @@
 function Scene(game, img) {
     this.game = game
     this.img = img
+    this.webSocket = null
 }
 
 // 加载游戏场景
@@ -34,6 +35,13 @@ Scene.prototype.clickListener = function () {
 // 卸载当前场景
 Scene.prototype.unload = function () {
     this.$ele.remove()
+}
+
+/**
+ * 连接服务器，有子类复写
+ */
+Scene.prototype.connect = function () {
+
 }
 
 function elePosition(oElement) {

@@ -9,7 +9,9 @@ CompleteScene.prototype = Object.create(Scene.prototype)
 CompleteScene.prototype.constructor = CompleteScene
 
 // 重写load方法，添加下滑效果
-CompleteScene.prototype.load = function(append){
+CompleteScene.prototype.load = function(append, params){
+    console.log(params)
+    this.params = params
     Scene.prototype.load.call(this, append)
     this.$ele.hide().delay(300).slideDown(1000, function(){
         // 删除通关场景后面的所有标签元素

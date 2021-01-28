@@ -32,7 +32,7 @@ public class RoomService {
         return ResponseResult.defSuccessful(roomNum);
     }
 
-    public void destroyRoom(int roomNum){
+    public static void destroyRoom(int roomNum){
         rooms.remove(roomNum);
     }
 

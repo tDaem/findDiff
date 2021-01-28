@@ -1,9 +1,9 @@
 // 登录场景
-function LoginScene(game, src) {
+function LoginScene(game, src, params) {
     src = src || 'images/login_bg.png'
     // 调用父类构造函数
     // 使用别人构造函数构造自己的对象
-    Scene.call(this, game, src)
+    Scene.call(this, game, src, params)
     console.log(this)
 }
 
@@ -52,7 +52,7 @@ LoginScene.prototype.loginBtnClick = function () {
     var loading = dialog({});
     loading.showModal()
     //发起请求
-    $.ajax({
+    $.ajax({//根据序列号登录
         url: "/serial",
         type: 'get',
         timeout: 12000,
@@ -67,7 +67,10 @@ LoginScene.prototype.loginBtnClick = function () {
                 //序列号校验
                 //存在该序列号时进入相应的游戏
                 console.log(this)
-                this.game.loadStartScene(this)
+                this.game.loadStartScene(this,{
+                    gameId: gameId,
+                    serialNum: serialNum
+                })
 
             } else {
                 //序列号输入错误时 弹出提示
@@ -124,3 +127,4 @@ LoginScene.prototype.load = function (prevScene) {
     // 调用父类load方法
     Scene.prototype.load.call(this)
 }
+

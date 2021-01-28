@@ -15,11 +15,7 @@ function GameScene(game, datas) {
 GameScene.prototype = Object.create(Scene.prototype)
 GameScene.prototype.constructor = GameScene
 
-/**
- * 重写load方法，添加全屏按扭、倒计时、数字标签
- * @param prevScene 上一个游戏场景
- */
-GameScene.prototype.load = function (prevScene) {
+GameScene.prototype.initGame = function (prevScene) {
     this.differences = new Differences(this.game, this.data)
     this.fullScreenBtn = new FullScreenButton(this.game.box)
     this.skipBtn = new SkipButton(this.game.box, {
@@ -51,11 +47,61 @@ GameScene.prototype.load = function (prevScene) {
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
     // 同时开始倒计时
-    prevScene.$ele.fadeOut(1500, function () {
+    prevScene.soloGameBtn.remove()
+    prevScene.teamGameBtn.remove()
+    prevScene.fullScreen.remove()
+    prevScene.$ele.fadeOut(1500, () => {
         console.log('game scene loaded')
         prevScene.unload()
         this.secondManager.start()
-    }.bind(this))
+    })
+}
+
+/**
+ * 处理坐标数据
+ */
+GameScene.prototype.processData = function () {
+
+}
+
+/**
+ * 重写load方法，添加全屏按扭、倒计时、数字标签
+ * @param prevScene 上一个游戏场景
+ */
+GameScene.prototype.load = function (prevScene, params) {
+    console.log(params)
+    this.params = params
+    //建立长连接
+    if ('WebSocket' in window) {
+        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + params.roomNum + "/" + "Ghy8kilY");
+    } else {
+        alert('当前浏览器不支持WebSocket！')
+    }
+    this.webSocket.onopen = () => {
+        console.log("进入房间...")
+        this.initGame(prevScene)
+    }
+    this.webSocket.onmessage = (ret) => {
+        console.log(ret.data)
+        console.log(this)
+        var msg = JSON.parse(ret.data)
+        if (msg.code === 0) {
+            if (msg.data.messageType === 'TIP') {
+                //弹出消息，进入游戏
+                console.log(msg.data.data)
+            } else if (ret.data.messageType === 'DATA') {
+                //处理数据
+                this.processData()
+            }
+        }
+    }
+    this.webSocket.onclose = () => {
+        console.log("连接已关闭...")
+        this.webSocket = null
+    }
+    this.webSocket.onerror = () => {
+        console.log("连接错误...")
+    }
 }
 
 // 重写点击监听函数
@@ -64,6 +110,10 @@ GameScene.prototype.clickListener = function (x, y) {
 
     if (this.differences.check(x, y)) {
         this.label.decrease()
+        this.webSocket.send(JSON.stringify({
+            x: x,
+            y: y
+        }))
     }
 }
 
@@ -100,7 +150,7 @@ GameScene.prototype.confirm = function () {
             title: '温馨提示',
             content: '还有' + (this.label.value) + '处不同未找到!',
             okValue: '确定',
-            ok: function (){
+            ok: function () {
                 return true
             }
         }
