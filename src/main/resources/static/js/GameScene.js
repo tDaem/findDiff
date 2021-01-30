@@ -70,7 +70,7 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum + "/" + "Ghy8kilY");
+        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + /*this.params.roomNum*/ 765687  + "/" + "Ghy8kilY");
     } else {
         alert('当前浏览器不支持WebSocket！')
     }
@@ -127,6 +127,14 @@ GameScene.prototype.clickListener = function (x, y) {
             x: x,
             y: y
         }))
+    }else {
+        var errorLeft = x - radius
+        var errorTop = y - radius
+        var errorLeft_1 = x - radius - $(this.game.box).width() / 2
+        var errorTop_1 = y - radius
+        this.differences.show(null, errorLeft, errorTop)
+        //左边也同时画圈
+        this.differences.show(null, errorLeft_1, errorTop_1)
     }
 }
 

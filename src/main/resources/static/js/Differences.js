@@ -31,14 +31,6 @@ Differences.prototype.check = function (x, y) {
             //左边也同时画圈
             this.show(diff, left_1, top_1)
             return true
-        } else {
-            var errorLeft = x - radius
-            var errorTop = y - radius
-            var errorLeft_1 = x - radius - $(this.game.box).width() / 2
-            var errorTop_1 = y - radius
-            this.show(null, errorLeft, errorTop)
-            //左边也同时画圈
-            this.show(null, errorLeft_1, errorTop_1)
         }
     }
     return false

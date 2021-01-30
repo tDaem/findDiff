@@ -41,13 +41,14 @@ public class WebsocketController {
     @OnOpen
     public void onOpen(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, Session session) throws IOException {
 
+        logger.info(serialNum + "进入房间");
         //将用户加入该房间
         Map<Integer, List<Session>> rooms = RoomService.getRooms();
         rooms.get(roomNum).add(session);
 
         try {
             //推送房间中的数据
-            broadcast(roomNum, session, Message.DATA(RoomService.getRoomDatas(roomNum)));
+            broadcast(roomNum, session, true, Message.DATA(RoomService.getRoomDatas(roomNum)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,16 +111,26 @@ public class WebsocketController {
      * @param roomNum 房间号
      * @param message 向房间中发送消息
      */
-    private static <T> void broadcast(int roomNum, Session self, ResponseResult<Message<T>> message) {
+    private static <T> void broadcast(int roomNum, Session self, boolean onOpen, ResponseResult<Message<T>> message) {
 
         for (Session session : RoomService.getRooms().get(roomNum)) {
-            if (session.equals(self)) continue;
+            if (!onOpen && session.equals(self)) continue;
             try {
                 session.getBasicRemote().sendObject(message);
             } catch (IOException | EncodeException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 非刚进入房间
+     *
+     * @param roomNum 房间号
+     * @param message 向房间中发送消息
+     */
+    private static <T> void broadcast(int roomNum, Session self, ResponseResult<Message<T>> message) {
+        broadcast(roomNum, self, false, message);
     }
 
 
