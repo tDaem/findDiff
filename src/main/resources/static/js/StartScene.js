@@ -75,50 +75,6 @@ StartScene.prototype.load = function (prevScene, params) {
     prevScene.$ele.fadeOut(delayTime, () => {
             console.log('start scene loaded')
             prevScene.unload()
-            //获取房间号（无论单人或多人游戏）
-            var loading = dialog()
-            $.ajax({
-                url: "/room",
-                type: 'get',
-                timeout: 12000,
-                dataType: 'json',
-                success: ret => {
-                    loading.close().remove()
-                    console.log(ret)
-                    if (ret.code === 0 && ret.data) {
-                        this.params.roomNum = ret.data//保存房间号
-                    } else {
-                        var d = dialog({
-                            content: '进入游戏失败！'
-                        });
-                        d.show();
-                        setTimeout(function () {
-                            d.close().remove();
-                        }, 2000);
-                    }
-                },
-                error: ret => {
-                    loading.close().remove()
-                    console.log(ret)
-                    if (ret.status == 'timeout') {
-                        var d = dialog({
-                            content: '请求超时，请检查网络！'
-                        });
-                        d.show();
-                        setTimeout(function () {
-                            d.close().remove();
-                        }, 2000);
-                    } else {
-                        var d = dialog({
-                            content: '服务器异常！'
-                        });
-                        d.show();
-                        setTimeout(function () {
-                            d.close().remove();
-                        }, 2000);
-                    }
-                }
-            })
         }
     )
 }

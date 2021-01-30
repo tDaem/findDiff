@@ -28,7 +28,7 @@ Game.prototype.LR = {
  * 上下布局参数
  * @type {{cursor: string, width: string, position: string, "min-width": string, height: string}}
  */
-Game.prototype.TB = {
+Game.prototype.UD = {
     'min-width': '565px',
     'width': '565px',
     'height': '900px',
@@ -52,35 +52,130 @@ Game.prototype.listen = function () {//获取点击的在盒子上的坐标（�
 }
 
 Game.prototype.loadLoginScene = function (params) {//
-    if (params && params.layout === 'TB') {
-        $(this.box).css(this.TB)
-    } else {
-        $(this.box).css(this.LR)
-    }
+    $(this.box).css(this.LR)
     var scene = new LoginScene(this, params)//登录场景
     scene.load()
 }
 
 Game.prototype.loadStartScene = function (prevScene, params) {//
-    if (params && params.layout === 'TB') {
-        $(this.box).css(this.TB)
-    } else {
-        $(this.box).css(this.LR)
-    }
-    var scene = new StartScene(this)//开始时的场景 有个默认参数src = 'images/0.jpg'  用new StartScene(this)初始化一个对象 将开始场景传入进去
-    scene.load(prevScene, params)
+    $(this.box).css(this.LR)
+    var loading = dialog({
+        content: "请稍后..."
+    })
+    loading.showModal()
+    $.ajax({
+        url: "/game/" + params.serial.game.id,
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        success: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.code === 0 && ret.data) {
+                //存在该序列号时进入相应的游戏
+                console.log(ret.data)
+                params.game = ret.data//游戏及关卡数据
+                var scene = new StartScene(this)
+                scene.load(prevScene, params)
+            } else {
+                //序列号输入错误时 弹出提示
+                var d = dialog({
+                    content: '没有找到该游戏序列号对应的游戏！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        },
+        error: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.status == 'timeout') {
+                var d = dialog({
+                    content: '请求超时，请检查网络！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            } else {
+                var d = dialog({
+                    content: '加载游戏失败请稍后尝试！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        }
+    })
+
 }
 
 //加载下一张图片
 Game.prototype.loadGameScene = function (prevScene, params) {
-    console.log('load next scene...')
-    if (params && params.layout === 'TB') {
-        $(this.box).css(this.TB)
-    } else {
-        $(this.box).css(this.LR)
+    console.log(params)
+    params.game.gameSceneDatas = Game.GameSceneDatas
+    if (params.game && params.game.gameSceneDatas.length === 0 ){
+        dialog({
+            title: "温馨提示",
+            content: "游戏配置错误，请联系管理员！",
+            okValue: '确定',
+            ok: function () {
+                return true
+            }
+        }).showModal()
+        return
     }
-    var scene = new GameScene(this, Game.GameSceneDatas)//游戏进行中的 传入场景数据
-    scene.load(prevScene, params)
+    //获取房间号（无论单人或多人游戏）
+    var loading = dialog()
+    loading.showModal()
+    $.ajax({
+        url: "/room",
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        success: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.code === 0 && ret.data) {
+                console.log('load next scene...')
+                params.roomNum = ret.data//保存房间号
+                var scene = new GameScene(this, params.game.gameSceneDatas)//游戏进行中的 传入场景数据
+                scene.load(prevScene, params)
+            } else {
+                var d = dialog({
+                    content: '进入游戏失败！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        },
+        error: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.status == 'timeout') {
+                var d = dialog({
+                    content: '请求超时，请检查网络！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            } else {
+                var d = dialog({
+                    content: '服务器异常！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        }
+    })
 }
 
 // 加载游戏完成的场景

@@ -49,7 +49,9 @@ LoginScene.prototype.loginBtnClick = function () {
         return;
     }
     //发起请求时，占位空间按
-    var loading = dialog({});
+    var loading = dialog({
+        content: "登陆中..."
+    });
     loading.showModal()
     //发起请求
     $.ajax({//根据序列号登录
@@ -63,19 +65,19 @@ LoginScene.prototype.loginBtnClick = function () {
         success: ret => {
             loading.close().remove()
             console.log(ret)
-            if (ret.code === 0 && ret.data) {
+            if (ret.code === 0 && ret.data && ret.data.game && ret.data.game.id) {
                 //序列号校验
                 //存在该序列号时进入相应的游戏
-                console.log(this)
+                console.log(ret.data)
                 this.game.loadStartScene(this,{
                     gameId: gameId,
-                    serialNum: serialNum
+                    serial: ret.data
                 })
 
             } else {
                 //序列号输入错误时 弹出提示
                 var d = dialog({
-                    content: '没有找到该游戏序列号！'
+                    content: '没有找到该游戏序列号,或该游戏序列号没有匹配的游戏！'
                 });
                 d.show();
                 setTimeout(function () {
@@ -96,7 +98,7 @@ LoginScene.prototype.loginBtnClick = function () {
                 }, 2000);
             }else {
                 var d = dialog({
-                    content: '服务器异常！'
+                    content: '登陆失败，请稍后尝试！'
                 });
                 d.show();
                 setTimeout(function () {

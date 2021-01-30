@@ -1,14 +1,18 @@
 // 找不同场景
 // 找不同游戏数据
 function GameScene(game, datas) {
+    console.log(datas)
     // 全部的游戏数据
     this.datas = datas
     this.index = 0
     // 当前正在进行的游戏的数据
     this.data = datas[this.index]
-
+    if (this.data.structure === 'UP_AND_DOWN'){
+        $(game.box).css(game.UD)
+    }else {
+        $(game.box).css(game.LR)
+    }
     Scene.call(this, game, this.data.src)
-    console.log(this)
 }
 
 // 构造原型链
@@ -70,7 +74,7 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + /*this.params.roomNum*/ 765687  + "/" + "Ghy8kilY");
+        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum  + "/" + "Ghy8kilY");
     } else {
         alert('当前浏览器不支持WebSocket！')
     }

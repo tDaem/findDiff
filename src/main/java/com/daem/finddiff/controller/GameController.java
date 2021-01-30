@@ -45,8 +45,8 @@ public class GameController {
      * @param id 游戏id
      * @return 如果删除成功，泛型中返回true，否则false
      */
-    @DeleteMapping(value = "/game")
-    public ResponseResult<Boolean> delGame(Integer id) {
+    @DeleteMapping(value = "/game/{id}")
+    public ResponseResult<Boolean> delGame(@PathVariable Integer id) {
         return gameService.delGame(id);
     }
 

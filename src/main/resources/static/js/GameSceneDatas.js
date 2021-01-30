@@ -1,6 +1,6 @@
 Game.GameSceneDatas = [
     {
-        src: 'images/1.jpg',
+        src: 'images/lr.jpg',
         structure: 'LEFT_AND_RIGHT',
         diffs: [
             {
