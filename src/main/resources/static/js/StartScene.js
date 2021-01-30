@@ -72,7 +72,7 @@ StartScene.prototype.load = function (prevScene, params) {
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
     prevScene.loginView.remove()
-    prevScene.$ele.fadeOut(1500, () => {
+    prevScene.$ele.fadeOut(delayTime, () => {
             console.log('start scene loaded')
             prevScene.unload()
             //获取房间号（无论单人或多人游戏）

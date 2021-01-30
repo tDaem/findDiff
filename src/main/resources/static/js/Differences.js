@@ -18,19 +18,27 @@ Differences.prototype.check = function (x, y) {
         // 继续循环下一个不同！
 
         // 计算“不同”区域
-        var left = diff.center.x - diff.radius
-        var right = diff.center.x + diff.radius
-        var top = diff.center.y - diff.radius
-        var bottom = diff.center.y + diff.radius
+        var left = diff.center.x - radius
+        var right = diff.center.x + radius
+        var top = diff.center.y - radius
+        var bottom = diff.center.y + radius
 
         if (x > left && x < right && y > top && y < bottom) {
             // 如果坐标点中“不同”，使用相关数据画圈
-            var left_1 = diff.center.x - diff.radius - $(this.game.box).width()/2
-            var top_1 = diff.center.y - diff.radius
+            var left_1 = diff.center.x - radius - $(this.game.box).width() / 2
+            var top_1 = diff.center.y - radius
             this.show(diff, left, top)
             //左边也同时画圈
             this.show(diff, left_1, top_1)
             return true
+        } else {
+            var errorLeft = x - radius
+            var errorTop = y - radius
+            var errorLeft_1 = x - radius - $(this.game.box).width() / 2
+            var errorTop_1 = y - radius
+            this.show(null, errorLeft, errorTop)
+            //左边也同时画圈
+            this.show(null, errorLeft_1, errorTop_1)
         }
     }
     return false
@@ -38,9 +46,10 @@ Differences.prototype.check = function (x, y) {
 
 // 画圈
 Differences.prototype.show = function (diff, left, top) {
-    $('<div class="diff">').css({
-        width: diff.radius * 2 + 'px',
-        height: diff.radius * 2 + 'px',
+    var diffDiv = $('<div class="diff">')
+    diffDiv.css({
+        width: radius * 2 + 'px',
+        height: radius * 2 + 'px',
         position: 'absolute',
         left: left + 'px',
         top: top + 'px',
@@ -48,8 +57,18 @@ Differences.prototype.show = function (diff, left, top) {
         borderRadius: '50%',
         animation: 's 1s'
     }).appendTo(this.game.box).show('')
-
-    diff.showed = true
+    diffDiv.click(function () {
+            console.log("阻止事件")
+            return false
+        }
+    )
+    if (diff) {
+        diff.showed = true
+    } else {
+        setTimeout(() => {
+            diffDiv.remove()
+        }, delayTime)
+    }
 }
 
 // 重置

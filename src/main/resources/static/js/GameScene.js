@@ -58,22 +58,19 @@ GameScene.prototype.initGame = function (prevScene) {
 }
 
 /**
- * 处理坐标数据
- */
-GameScene.prototype.processData = function () {
-
-}
-
-/**
  * 重写load方法，添加全屏按扭、倒计时、数字标签
  * @param prevScene 上一个游戏场景
  */
 GameScene.prototype.load = function (prevScene, params) {
     console.log(params)
     this.params = params
+    this.connect(prevScene)
+}
+
+GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + params.roomNum + "/" + "Ghy8kilY");
+        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum + "/" + "Ghy8kilY");
     } else {
         alert('当前浏览器不支持WebSocket！')
     }
@@ -82,16 +79,18 @@ GameScene.prototype.load = function (prevScene, params) {
         this.initGame(prevScene)
     }
     this.webSocket.onmessage = (ret) => {
+        console.log("收到服务端消息")
         console.log(ret.data)
-        console.log(this)
         var msg = JSON.parse(ret.data)
         if (msg.code === 0) {
             if (msg.data.messageType === 'TIP') {
                 //弹出消息，进入游戏
                 console.log(msg.data.data)
-            } else if (ret.data.messageType === 'DATA') {
+            } else if (msg.data.messageType === 'DATA') {
                 //处理数据
-                this.processData()
+                this.processData(msg.data.data)
+            } else {
+                console.log("游戏异常！")
             }
         }
     }
@@ -104,12 +103,26 @@ GameScene.prototype.load = function (prevScene, params) {
     }
 }
 
+/**
+ * 处理坐标数据
+ */
+GameScene.prototype.processData = function (data) {
+    console.log(data)
+    data.forEach((v, i) => {
+        this.differences.check(v.x, v.y)
+    })
+}
+
 // 重写点击监听函数
 GameScene.prototype.clickListener = function (x, y) {
     console.log('game scene click!')
 
+    /**
+     * 将正确的数据发送到后台
+     */
     if (this.differences.check(x, y)) {
-        this.label.decrease()
+        //蓝底变色
+        // this.label.decrease()
         this.webSocket.send(JSON.stringify({
             x: x,
             y: y
@@ -144,7 +157,7 @@ GameScene.prototype.reset = function (start) {
 /**
  * 点击确认时的方法
  */
-GameScene.prototype.confirm = function () {
+GameScene.prototype.confirm = function (event) {
     if (this.data.fakeCnt && this.data.diffs.length < this.data.fakeCnt || this.label.value > 0) {
         var option = {
             title: '温馨提示',
@@ -160,6 +173,7 @@ GameScene.prototype.confirm = function () {
     } else {
         this.pass()
     }
+    return false
 }
 
 /**
@@ -182,6 +196,7 @@ GameScene.prototype.skip = function () {
     dialog(option)
         .width(200)
         .showModal();
+    return false
 }
 /**
  * 延迟一段时间后再次调用（preview没有传）
@@ -196,7 +211,7 @@ GameScene.prototype.next = function () {
         // 添加下一个“不同”的图片到页面上
         this.$ele = $('<img>').attr('src', this.data.src).prependTo(this.game.box)
         // 将原图片淡出
-        ele.fadeOut(1500, function () {
+        ele.fadeOut(delayTime, function () {
             this.secondManager.start()
             ele.remove()
         }.bind(this))

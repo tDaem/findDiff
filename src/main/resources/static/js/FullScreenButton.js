@@ -36,6 +36,7 @@ FullScreenButton.prototype.show = function() {
                 else{
                     $(this).text('全屏')
                 }
+                return false
             }
         }
     }).text(FullScreenButton.isFullScreen ? '退出全屏' : '全屏')

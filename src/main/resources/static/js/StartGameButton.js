@@ -24,7 +24,7 @@ StartGameButton.prototype.show = function() {
             click: this.onClickListener//点击时回调
         }
     }).text(this.type ? "多人游戏" : "单人游戏")
-        .css(this.options).prependTo(this.box)
+        .css(this.options).appendTo(this.box)
 
     // 调用父类show方法
     View.prototype.show.call(this)

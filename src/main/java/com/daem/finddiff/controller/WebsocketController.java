@@ -1,5 +1,6 @@
 package com.daem.finddiff.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daem.finddiff.config.WebSocketEncoder;
 import com.daem.finddiff.dto.Message;
 import com.daem.finddiff.dto.ResponseResult;
@@ -14,10 +15,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,14 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Author tyx
  * @Date 2021/1/27
  */
-@ServerEndpoint(value = "/websocket/{roomNum}/{serialNum}",encoders = WebSocketEncoder.class/*,decoders = WebSocketDecoder.class*/)
+@ServerEndpoint(value = "/websocket/{roomNum}/{serialNum}", encoders = WebSocketEncoder.class/*,decoders = WebSocketDecoder.class*/)
 @Controller
 public class WebsocketController {
     private Logger logger = LoggerFactory.getLogger(WebsocketController.class);
     private static int onlineCount = 0;
     // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private static ConcurrentHashMap<String, Set<Session>> clients = new ConcurrentHashMap<>();
-    private static final Map<String, String> userNameList = new ConcurrentHashMap();
 
 
     /**
@@ -49,8 +46,8 @@ public class WebsocketController {
         rooms.get(roomNum).add(session);
 
         try {
-            logger.info("web socket 连接成功！");
-            broadcast(roomNum, Message.TIP("连接成功！"));
+            //推送房间中的数据
+            broadcast(roomNum, session, Message.DATA(RoomService.getRoomDatas(roomNum)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,13 +58,14 @@ public class WebsocketController {
      */
     @OnClose
     public void onClose(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, Session session) {
+        logger.info("serialNum=" + serialNum + " 退出房间");
         //获取房间中的所有成员
         List<Session> sessions = RoomService.getRooms().get(roomNum);
         //移除该成员
         sessions.remove(session);
         //销毁房间
-        if (sessions.size() == 0){
-            logger.info("destroyRoom roomNum=" + roomNum);
+        if (sessions.size() == 0) {
+            logger.info("房间无人，销毁房间 roomNum=" + roomNum);
             RoomService.destroyRoom(roomNum);
         }
 
@@ -87,20 +85,35 @@ public class WebsocketController {
         try {
             //广播坐标
             logger.info("收到客户端的消息：" + message);
-            broadcast(roomNum, Message.DATA(message));
+            DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
+            putData(roomNum, diffsCoordinate);
+            broadcast(roomNum, session, Message.DATA(RoomService.getRoomDatas(roomNum)));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 根据房间进行广播
+     * 根据房间号防止房间中的数据
      *
      * @param roomNum
-     * @param message
+     * @return
      */
-    private static <T> void broadcast(int roomNum, ResponseResult<Message<T>> message) {
+    private static void putData(int roomNum, DiffsCoordinate data) {
+        List<DiffsCoordinate> diffsCoordinates = RoomService.getRoomDatas(roomNum);
+        diffsCoordinates.add(data);
+    }
+
+    /**
+     * 根据房间进行广播
+     *
+     * @param roomNum 房间号
+     * @param message 向房间中发送消息
+     */
+    private static <T> void broadcast(int roomNum, Session self, ResponseResult<Message<T>> message) {
+
         for (Session session : RoomService.getRooms().get(roomNum)) {
+            if (session.equals(self)) continue;
             try {
                 session.getBasicRemote().sendObject(message);
             } catch (IOException | EncodeException e) {

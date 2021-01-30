@@ -19,7 +19,7 @@ LoginView.prototype.show = function () {
         width: '100%',
         height: '100%'
     }).html(html)
-        .css(this.options).prependTo(this.box)
+        .css(this.options).appendTo(this.box)
         .attr("id", "info")
 
     // 调用父类show方法

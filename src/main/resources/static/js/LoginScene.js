@@ -96,7 +96,7 @@ LoginScene.prototype.loginBtnClick = function () {
                 }, 2000);
             }else {
                 var d = dialog({
-                    content: '服务器异常，请联系作者！'
+                    content: '服务器异常！'
                 });
                 d.show();
                 setTimeout(function () {
