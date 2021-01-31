@@ -5,31 +5,34 @@ import com.daem.finddiff.config.WebSocketEncoder;
 import com.daem.finddiff.dto.Message;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
+import com.daem.finddiff.entity.GameUser;
 import com.daem.finddiff.service.RoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @Description
+ * @Description 处理房间的人联网数据
  * @Author tyx
- * @Date 2021/1/27
+ * @Date 2021/1/31
  */
-@ServerEndpoint(value = "/websocket/{roomNum}/{serialNum}", encoders = WebSocketEncoder.class/*,decoders = WebSocketDecoder.class*/)
+@ServerEndpoint(value = "/room/{roomNum}", encoders = WebSocketEncoder.class/*,decoders = WebSocketDecoder.class*/)
 @Controller
-public class WebsocketController {
-    private Logger logger = LoggerFactory.getLogger(WebsocketController.class);
+public class RoomWebsocketController {
+
+    private Logger logger = LoggerFactory.getLogger(RoomWebsocketController.class);
     private static int onlineCount = 0;
     // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private static ConcurrentHashMap<String, Set<Session>> clients = new ConcurrentHashMap<>();
+    private static Map<String, Set<Session>> clients = new ConcurrentHashMap<>();
 
 
     /**
@@ -39,13 +42,12 @@ public class WebsocketController {
      * @throws IOException
      */
     @OnOpen
-    public void onOpen(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, Session session) throws IOException {
+    public void onOpen(@PathParam("roomNum") int roomNum, Session session) throws IOException {
 
-        logger.info(serialNum + "进入房间");
+        logger.info(session.getPathParameters().get("serialNum") + "进入房间");
         //将用户加入该房间
         Map<Integer, List<Session>> rooms = RoomService.getRooms();
         rooms.get(roomNum).add(session);
-
         try {
             //推送房间中的数据
             broadcast(roomNum, session, true, Message.DATA(RoomService.getRoomDatas(roomNum)));
@@ -58,8 +60,8 @@ public class WebsocketController {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, Session session) {
-        logger.info("serialNum=" + serialNum + " 退出房间");
+    public void onClose(@PathParam("roomNum") int roomNum, Session session) {
+        logger.info(session.getPathParameters().get("serialNum") + " 退出房间");
         //获取房间中的所有成员
         List<Session> sessions = RoomService.getRooms().get(roomNum);
         //移除该成员
@@ -82,7 +84,7 @@ public class WebsocketController {
      * @throws IOException
      */
     @OnMessage
-    public void onMessage(@PathParam("roomNum") int roomNum, @PathParam("serialNum") String serialNum, String message, Session session) throws IOException {
+    public void onMessage(@PathParam("roomNum") int roomNum, String message, Session session) throws IOException {
         try {
             //广播坐标
             logger.info("收到客户端的消息：" + message);
@@ -151,11 +153,11 @@ public class WebsocketController {
     }
 
     public static synchronized void addOnlineCount() {
-        WebsocketController.onlineCount++;
+        RoomWebsocketController.onlineCount++;
     }
 
     public static synchronized void subOnlineCount() {
-        WebsocketController.onlineCount--;
+        RoomWebsocketController.onlineCount--;
     }
 
 }

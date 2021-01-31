@@ -92,13 +92,14 @@ StartScene.prototype.soloGameBtnClick = function () {
 StartScene.prototype.teamGameBtnClick = function () {
     var selectDialog = dialog({
         title: "游戏方式",
+        content: "请选择游戏模式",
         okValue: "创建房间",
         ok: () => {
-            return this.processCreateRoom()
+            return this.processCreateRoom(selectDialog)
         },
         cancelValue: "加入房间",
         cancel: () => {
-            return this.processJoinRoom()
+            return this.processJoinRoom(selectDialog)
         }
     })
     selectDialog.showModal()
@@ -116,96 +117,96 @@ StartScene.prototype.processCreateRoom = function () {
         timeout: 12000,
         dataType: 'json',
         success: ret => {
-            loading.close().remove()
             console.log(ret)
+            loading.close().remove()
             if (ret.code === 0 && ret.data) {
                 console.log('load next scene...')
                 this.params.roomNum = ret.data//保存房间号
                 showRoomInfo()//展示房间信息
             } else {
-                var d = dialog({
-                    content: '创建房间失败，请稍后重试！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
+                floatDialog('创建房间失败，请稍后重试！')
             }
         },
         error: ret => {
-            loading.close().remove()
             console.log(ret)
+            loading.close().remove()
             if (ret.status == 'timeout') {
-                var d = dialog({
-                    content: '请求超时，请检查网络！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
+                floatDialog('请求超时，请检查网络！')
             } else {
-                var d = dialog({
-                    content: '服务器异常！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
+                floatDialog('服务器异常！')
             }
         }
     })
+    return false
 }
 
 //处理加入多人房间逻辑
-StartScene.prototype.processJoinRoom = function () {
-    var loading = dialog({
+StartScene.prototype.processJoinRoom = function (preDialog) {
+    var joinRoomDialog = dialog({
         title: "加入房间",
+        content: contentHtml,
         okValue: "加入房间",
-
-    })
-    loading.showModal()
-    $.ajax({
-        url: "/room",
-        type: 'get',
-        timeout: 12000,
-        dataType: 'json',
-        success: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.code === 0 && ret.data) {
-                console.log('load next scene...')
-                this.params.roomNum = ret.data//保存房间号
-                showRoomInfo()//展示房间信息
-            } else {
-                var d = dialog({
-                    content: '加入房间失败，请稍后重试！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
+        ok: () => {
+            var loading = dialog()
+            var roomNum = $('#roomNum').val()
+            if (roomNum.trim().length === 0){
+                floatDialog('请输入房间号')
+                return true
             }
+            preDialog.close().remove()
+            $.ajax({
+                url: '/room/' + roomNum,
+                type: 'get',
+                timeout: 12000,
+                dataType: 'json',
+                success: ret => {
+                    console.log(ret)
+                    if (ret.code === 0 && ret.data) {
+                        loading.close().remove()
+                        console.log('load next scene...')
+                        this.params.roomNum = ret.data//保存房间号
+                        showRoomInfo()//展示房间信息
+                    } else {
+                        floatDialog(ret.msg)
+                    }
+                },
+                error: ret => {
+                    loading.close().remove()
+                    console.log(ret)
+                    if (ret.status == 'timeout') {
+                        floatDialog('请求超时，请检查网络！')
+                    } else {
+                        floatDialog('服务器异常！')
+                    }
+                }
+            })
         },
-        error: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.status == 'timeout') {
-                var d = dialog({
-                    content: '请求超时，请检查网络！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
-            } else {
-                var d = dialog({
-                    content: '服务器异常！'
-                });
-                d.show();
-                setTimeout(function () {
-                    d.close().remove();
-                }, 2000);
-            }
+        cancelValue: "取消",
+        cancel: () => {
+
         }
     })
+    joinRoomDialog.showModal()
+    return false
 }
+
+/**
+ * 浮动的提醒消息 2秒后移除
+ * @param msg
+ */
+var floatDialog = function (msg) {
+    var d = dialog({
+        content: msg
+    });
+    d.show();
+    setTimeout(function () {
+        d.close().remove();
+    }, 2000);
+}
+
+var contentHtml = '' +
+    '  <div class="form-inline">' +
+    '    <label for="roomNum">房间号：</label>' +
+    '    <input type="number" class="form-control" id="roomNum" placeholder="输入房间号...">' +
+    '  </div>'
+

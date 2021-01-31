@@ -25,6 +25,7 @@ public class RoomService {
 
     /**
      * 创建房间号
+     *
      * @return
      */
     public ResponseResult<Integer> createRoom() {
@@ -37,18 +38,44 @@ public class RoomService {
         return ResponseResult.defSuccessful(roomNum);
     }
 
-    public static void destroyRoom(int roomNum){
+    /**
+     * 当房间无人时，销毁房间并销毁房间中的数据
+     * @param roomNum
+     */
+    public static void destroyRoom(int roomNum) {
         //销毁房间中的数据
         roomDatas.remove(roomNum);
         //销毁房间
         rooms.remove(roomNum);
     }
 
+    /**
+     * 房间中的用户
+     * @return
+     */
     public static Map<Integer, List<Session>> getRooms() {
         return rooms;
     }
 
+    /**
+     * 记录房间中不同点的做标数据
+     * @param roomNum
+     * @return
+     */
     public static List<DiffsCoordinate> getRoomDatas(int roomNum) {
         return roomDatas.get(roomNum);
+    }
+
+    /**
+     * 查找房间号是否存在
+     *
+     * @param roomNum 房间号
+     * @return
+     */
+    public ResponseResult<Integer> getRoom(int roomNum) {
+        if (rooms.containsKey(roomNum)) {
+            return ResponseResult.defSuccessful(roomNum);
+        }
+        return ResponseResult.defFailed("没有找到该房间！");
     }
 }

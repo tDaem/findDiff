@@ -81,7 +81,7 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum + "/" + "Ghy8kilY");
+        this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
     } else {
         alert('当前浏览器不支持WebSocket！')
     }
