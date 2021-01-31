@@ -7,9 +7,9 @@ function GameScene(game, datas) {
     this.index = 0
     // 当前正在进行的游戏的数据
     this.data = datas[this.index]
-    if (this.data.structure === 'UP_AND_DOWN'){
+    if (this.data.structure === 'UP_AND_DOWN') {
         $(game.box).css(game.UD)
-    }else {
+    } else {
         $(game.box).css(game.LR)
     }
     Scene.call(this, game, this.data.src)
@@ -21,43 +21,46 @@ GameScene.prototype.constructor = GameScene
 
 GameScene.prototype.initGame = function (prevScene) {
     this.differences = new Differences(this.game, this.data)
-    this.fullScreenBtn = new FullScreenButton(this.game.box)
+    this.fullScreenBtn = new FullScreenButton(this.game.box,{
+        left: '0px',
+        bottom: '-40px'
+    })
     this.skipBtn = new SkipButton(this.game.box, {
-        left: '825px',
-        bottom: '9px'
+        left: '852px',
+        bottom: '-40px'
     })
     this.confirmBtn = new ConfirmButton(this.game.box, {
         left: '825px',
         bottom: '54px'
     })
-    this.secondManager = new SecondManager(this.game.box, this.data.seconds)
-    this.label = new Label(this.game.box, this.data.fakeCnt || this.data.diffs.length)
+    // this.secondManager = new SecondManager(this.game.box, this.data.seconds)
+    // this.label = new Label(this.game.box, this.data.fakeCnt || this.data.diffs.length)
 
     this.skipBtn.setOnClickListener(this.skip.bind(this))//this指向当前场景
     this.confirmBtn.setOnClickListener(this.confirm.bind(this)) //this指向当前场景
 
-    this.fullScreenBtn.show()
+    // this.fullScreenBtn.show()
     this.skipBtn.show()
-    this.confirmBtn.show()
-    this.secondManager.show()
-    this.label.show()
+    // this.confirmBtn.show()
+    // this.secondManager.show()
+    // this.label.show()
 
     Scene.prototype.load.call(this)
 
     // 根据游戏数据设置数字标签的初始值及回调函数
     // 根据游戏数据设置倒计时的初始值及回调函数
-    this.label.set(this.pass.bind(this), this.data.fakeCnt || this.data.diffs.length)
-    this.secondManager.set(this.timeout.bind(this), this.data.seconds)
+    // this.label.set(this.pass.bind(this), this.data.fakeCnt || this.data.diffs.length)
+    // this.secondManager.set(this.timeout.bind(this), this.data.seconds)
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
     // 同时开始倒计时
     prevScene.soloGameBtn.remove()
     prevScene.teamGameBtn.remove()
-    prevScene.fullScreen.remove()
-    prevScene.$ele.fadeOut(1500, () => {
+    // prevScene.fullScreen.remove()
+    prevScene.$ele.fadeOut(delayTime, () => {
         console.log('game scene loaded')
         prevScene.unload()
-        this.secondManager.start()
+        // this.secondManager.start()
     })
 }
 
@@ -71,10 +74,14 @@ GameScene.prototype.load = function (prevScene, params) {
     this.connect(prevScene)
 }
 
+/***
+ * 连接服务器
+ * @param prevScene
+ */
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum  + "/" + "Ghy8kilY");
+        this.webSocket = new WebSocket("ws://localhost:8090/websocket/" + this.params.roomNum + "/" + "Ghy8kilY");
     } else {
         alert('当前浏览器不支持WebSocket！')
     }
@@ -131,7 +138,7 @@ GameScene.prototype.clickListener = function (x, y) {
             x: x,
             y: y
         }))
-    }else {
+    } else {
         var errorLeft = x - radius
         var errorTop = y - radius
         var errorLeft_1 = x - radius - $(this.game.box).width() / 2
@@ -156,14 +163,14 @@ GameScene.prototype.timeout = function () {
  * @param start
  */
 GameScene.prototype.reset = function (start) {
-    this.label.set(this.pass.bind(this), this.data.fakeCnt || this.data.diffs.length)
-    this.secondManager.set(this.timeout.bind(this), this.data.seconds)
+    // this.label.set(this.pass.bind(this), this.data.fakeCnt || this.data.diffs.length)
+    // this.secondManager.set(this.timeout.bind(this), this.data.seconds)
     this.differences.reset()
 
     // 从超时场景返回时需要再次将游戏的点击监听函数切换成游戏场景的监听函数
     this.game.clickListener = this.clickListener.bind(this)
 
-    if (start) this.secondManager.start()
+    // if (start) this.secondManager.start()
 }
 
 /**
@@ -218,15 +225,24 @@ GameScene.prototype.skip = function () {
 GameScene.prototype.next = function () {
     if (++this.index < this.datas.length) {
         this.data = this.datas[this.index]
-
         var ele = this.$ele
-        // 添加下一个“不同”的图片到页面上
-        this.$ele = $('<img>').attr('src', this.data.src).prependTo(this.game.box)
         // 将原图片淡出
-        ele.fadeOut(delayTime, function () {
-            this.secondManager.start()
+        ele.fadeOut(delayTime, () => {
+            // this.secondManager.start()
             ele.remove()
-        }.bind(this))
+            if (this.data.structure === 'UP_AND_DOWN') {
+                $(this.game.box).css(this.game.UD)
+                console.log(this.skipBtn)
+                this.skipBtn.$ele.css({
+                    left: '565px',
+                    bottom: '0'
+                })
+            } else {
+                $(this.game.box).css(this.game.LR)
+            }
+            // 添加下一个“不同”的图片到页面上
+            this.$ele = $('<img>').attr('src', this.data.src).prependTo(this.game.box)
+        })
 
         this.reset()
 
@@ -242,7 +258,7 @@ GameScene.prototype.pass = function (label, preview) {
     if (preview) {
         // 当数字标签上的数字变为0时立即调用
         // 停止倒计时，播放音效
-        this.secondManager.stop()
+        // this.secondManager.stop()
 
         if (this.index < this.datas.length - 1) {
             this.game.audio.playPass()

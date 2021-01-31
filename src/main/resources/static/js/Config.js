@@ -1,4 +1,4 @@
-const delayTime = 1000
+const delayTime = 500
 const radius = 30
 Game.Config = {}
 

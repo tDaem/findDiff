@@ -20,26 +20,6 @@ Game.GameSceneDatas = [
             }]
     },
     {
-        src: 'images/lr.jpg',
-        structure: 'LEFT_AND_RIGHT',
-        diffs: [
-            {
-                center: {x: 494, y: 402}
-            },
-            {
-                center: {x: 622, y: 413}
-            },
-            {
-                center: {x: 662, y: 76}
-            },
-            {
-                center: {x: 791, y: 75}
-            },
-            {
-                center: {x: 864, y: 121}
-            }]
-    },
-    {
         src: 'images/tb.jpg',
         structure: 'UP_AND_DOWN',
         diffs: [

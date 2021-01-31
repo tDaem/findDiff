@@ -29,8 +29,8 @@ StartScene.prototype.load = function (prevScene, params) {
     this.params = params
     //全屏按钮
     this.fullScreen = new FullScreenButton(this.game.box, {
-        left: 'auto',
-        right: '20px',
+        left: '0px',
+        bottom: '-40px',
         zIndex: 9
     })
     //单人游戏按钮
@@ -65,7 +65,7 @@ StartScene.prototype.load = function (prevScene, params) {
 
     this.teamGameBtn.show()
 
-    this.fullScreen.show()
+    // this.fullScreen.show()
 
     // 调用父类load方法
     Scene.prototype.load.call(this)
@@ -79,10 +79,133 @@ StartScene.prototype.load = function (prevScene, params) {
     )
 }
 
+/**
+ * 单人游戏按钮点击事件
+ */
 StartScene.prototype.soloGameBtnClick = function () {
     this.game.loadGameScene(this, this.params)
 }
 
+/**
+ * 多人游戏按钮点击事件
+ */
 StartScene.prototype.teamGameBtnClick = function () {
+    var selectDialog = dialog({
+        title: "游戏方式",
+        okValue: "创建房间",
+        ok: () => {
+            return this.processCreateRoom()
+        },
+        cancelValue: "加入房间",
+        cancel: () => {
+            return this.processJoinRoom()
+        }
+    })
+    selectDialog.showModal()
+}
 
+//处理创建多人房间逻辑
+StartScene.prototype.processCreateRoom = function () {
+    var loading = dialog({
+        content: "正在创建房间..."
+    })
+    loading.showModal()
+    $.ajax({
+        url: "/room",
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        success: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.code === 0 && ret.data) {
+                console.log('load next scene...')
+                this.params.roomNum = ret.data//保存房间号
+                showRoomInfo()//展示房间信息
+            } else {
+                var d = dialog({
+                    content: '创建房间失败，请稍后重试！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        },
+        error: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.status == 'timeout') {
+                var d = dialog({
+                    content: '请求超时，请检查网络！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            } else {
+                var d = dialog({
+                    content: '服务器异常！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        }
+    })
+}
+
+//处理加入多人房间逻辑
+StartScene.prototype.processJoinRoom = function () {
+    var loading = dialog({
+        title: "加入房间",
+        okValue: "加入房间",
+
+    })
+    loading.showModal()
+    $.ajax({
+        url: "/room",
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        success: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.code === 0 && ret.data) {
+                console.log('load next scene...')
+                this.params.roomNum = ret.data//保存房间号
+                showRoomInfo()//展示房间信息
+            } else {
+                var d = dialog({
+                    content: '加入房间失败，请稍后重试！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        },
+        error: ret => {
+            loading.close().remove()
+            console.log(ret)
+            if (ret.status == 'timeout') {
+                var d = dialog({
+                    content: '请求超时，请检查网络！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            } else {
+                var d = dialog({
+                    content: '服务器异常！'
+                });
+                d.show();
+                setTimeout(function () {
+                    d.close().remove();
+                }, 2000);
+            }
+        }
+    })
 }

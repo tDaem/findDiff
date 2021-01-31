@@ -21,7 +21,7 @@ Game.prototype.LR = {
     'width': '900px',
     'height': '565px',
     'cursor': 'pointer',
-    'position': 'relative'
+    position: 'relative'
 }
 
 /**
