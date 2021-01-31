@@ -2,12 +2,17 @@ package com.daem.finddiff.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daem.finddiff.config.WebSocketEncoder;
+import com.daem.finddiff.dao.SerialDao;
 import com.daem.finddiff.dto.Message;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
+import com.daem.finddiff.entity.GameUser;
 import com.daem.finddiff.service.RoomService;
+import com.daem.finddiff.service.SerialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -28,9 +33,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameWebsocketController {
     private Logger logger = LoggerFactory.getLogger(GameWebsocketController.class);
     private static int onlineCount = 0;
-    // concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private static ConcurrentHashMap<String, Set<Session>> clients = new ConcurrentHashMap<>();
 
+    //此处是解决无法注入的
+    private static ApplicationContext applicationContext;
+
+    private SerialDao serialDao;
+
+    public static void setApplicationContext(ApplicationContext applicationContext) {
+        GameWebsocketController.applicationContext = applicationContext;
+    }
 
     /**
      * 连接建立成功调用的方法
@@ -40,17 +51,45 @@ public class GameWebsocketController {
      */
     @OnOpen
     public void onOpen(@PathParam("roomNum") int roomNum, Session session) throws IOException {
-
         logger.info(session.getRequestParameterMap().get("serialNum") + "进入房间");
         //将用户加入该房间
         Map<Integer, List<Session>> rooms = RoomService.getRooms();
         rooms.get(roomNum).add(session);
-
+        boolean mutilPlay = false;
+        List<String> mutilPlays = session.getRequestParameterMap().get("mutilPlay");
+        if (mutilPlays != null && mutilPlays.size() > 0) {
+            mutilPlay = Boolean.parseBoolean(mutilPlays.get(0));
+        }
         try {
             //推送房间中的数据
-            broadcast(roomNum, session, true, Message.DATA(RoomService.getRoomDatas(roomNum)));
+            if (!mutilPlay) {
+                broadcast(roomNum, session, true, Message.DATA(RoomService.getRoomDatas(roomNum)));
+            } else {//推送房间中的用户
+                broadcast(roomNum);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 推送房间中的用户
+     * @param roomNum
+     */
+    private void broadcast(int roomNum) throws Exception {
+        List<String> gameNames =  new ArrayList<>();
+        this.serialDao = applicationContext.getBean(SerialDao.class);
+        for (Session session : RoomService.getRooms().get(roomNum)) {
+            String gameName = session.getRequestParameterMap().get("gameName").get(0);
+            gameNames.add(gameName);
+        }
+        //将房间里的用户广播出去
+        for (Session session : RoomService.getRooms().get(roomNum)) {
+            try {
+                session.getBasicRemote().sendObject(Message.DATA(gameNames));
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -58,13 +97,14 @@ public class GameWebsocketController {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(@PathParam("roomNum") int roomNum, Session session) {
+    public void onClose(@PathParam("roomNum") int roomNum, Session session) throws Exception {
         logger.info(session.getRequestParameterMap().get("serialNum") + " 退出房间");
         //获取房间中的所有成员
         List<Session> sessions = RoomService.getRooms().get(roomNum);
         //移除该成员
         sessions.remove(session);
         //销毁房间
+        broadcast(roomNum);
         if (sessions.size() == 0) {
             logger.info("房间无人，销毁房间 roomNum=" + roomNum);
             RoomService.destroyRoom(roomNum);

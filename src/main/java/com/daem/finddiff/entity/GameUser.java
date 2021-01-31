@@ -37,7 +37,7 @@ public class GameUser {
     /**
      * 该用户玩的游戏对应的序列号id
      */
-    @OneToOne
+    @OneToOne(fetch=FetchType.EAGER)
     private Serial serial;
 
 }

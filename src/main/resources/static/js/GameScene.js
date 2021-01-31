@@ -21,7 +21,7 @@ GameScene.prototype.constructor = GameScene
 
 GameScene.prototype.initGame = function (prevScene) {
     this.differences = new Differences(this.game, this.data)
-    this.fullScreenBtn = new FullScreenButton(this.game.box,{
+    this.fullScreenBtn = new FullScreenButton(this.game.box, {
         left: '0px',
         bottom: '-40px'
     })
@@ -81,9 +81,11 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
+        if (!this.webSocket)
+            this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
     } else {
         alert('当前浏览器不支持WebSocket！')
+        return
     }
     this.webSocket.onopen = () => {
         console.log("进入房间...")

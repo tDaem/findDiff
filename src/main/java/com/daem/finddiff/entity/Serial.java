@@ -50,7 +50,7 @@ public class Serial {
      * 多个序列号玩同一个游戏
      */
     @ManyToOne
-    private Game Game;
+    private Game game;
 
     /**
      * 该实体创建的时间

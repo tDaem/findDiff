@@ -93,20 +93,30 @@ StartScene.prototype.teamGameBtnClick = function () {
     var selectDialog = dialog({
         title: "游戏方式",
         content: "请选择游戏模式",
-        okValue: "创建房间",
-        ok: () => {
-            return this.processCreateRoom(selectDialog)
-        },
-        cancelValue: "加入房间",
-        cancel: () => {
-            return this.processJoinRoom(selectDialog)
-        }
+        button: [
+            {
+                id: 'join',
+                value: '加入房间',
+                callback: () => {
+                    this.processJoinRoom(selectDialog)
+                    return false;
+                }
+            },
+            {
+                id: 'create',
+                value: "创建房间",
+                callback: () => {
+                    this.processCreateRoom(selectDialog)
+                    return false;
+                }
+            }]
     })
     selectDialog.showModal()
 }
 
 //处理创建多人房间逻辑
-StartScene.prototype.processCreateRoom = function () {
+StartScene.prototype.processCreateRoom = function (preDialog) {
+    preDialog.close().remove()
     var loading = dialog({
         content: "正在创建房间..."
     })
@@ -122,7 +132,7 @@ StartScene.prototype.processCreateRoom = function () {
             if (ret.code === 0 && ret.data) {
                 console.log('load next scene...')
                 this.params.roomNum = ret.data//保存房间号
-                showRoomInfo()//展示房间信息
+                this.connect()
             } else {
                 floatDialog('创建房间失败，请稍后重试！')
             }
@@ -142,6 +152,7 @@ StartScene.prototype.processCreateRoom = function () {
 
 //处理加入多人房间逻辑
 StartScene.prototype.processJoinRoom = function (preDialog) {
+    preDialog.close().remove()
     var joinRoomDialog = dialog({
         title: "加入房间",
         content: contentHtml,
@@ -149,11 +160,10 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
         ok: () => {
             var loading = dialog()
             var roomNum = $('#roomNum').val()
-            if (roomNum.trim().length === 0){
+            if (roomNum.trim().length === 0) {
                 floatDialog('请输入房间号')
-                return true
+                return false
             }
-            preDialog.close().remove()
             $.ajax({
                 url: '/room/' + roomNum,
                 type: 'get',
@@ -165,7 +175,7 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
                         loading.close().remove()
                         console.log('load next scene...')
                         this.params.roomNum = ret.data//保存房间号
-                        showRoomInfo()//展示房间信息
+                        this.connect()
                     } else {
                         floatDialog(ret.msg)
                     }
@@ -202,6 +212,87 @@ var floatDialog = function (msg) {
     setTimeout(function () {
         d.close().remove();
     }, 2000);
+}
+
+StartScene.prototype.connect = function () {
+    var loading = dialog()
+    loading.showModal()
+    //建立长连接
+    if ('WebSocket' in window) {
+        if (!this.webSocket)
+            this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
+    } else {
+        loading.close().remove()
+        alert('当前浏览器不支持WebSocket！')
+        return
+    }
+    this.webSocket.onopen = () => {
+        console.log("进入房间...")
+        loading.close().remove()
+    }
+    this.webSocket.onmessage = (ret) => {
+        console.log("收到服务端消息")
+        console.log(ret.data)
+        var msg = JSON.parse(ret.data)
+        if (msg.code === 0) {
+            if (msg.data.messageType === 'TIP') {
+                //弹出消息，进入游戏
+                console.log(msg.data.data)
+            } else if (msg.data.messageType === 'DATA') {
+                //处理数据
+                this.updateRoomInfo(msg.data.data)
+            } else {
+                console.log("游戏异常！")
+            }
+        }
+    }
+    this.webSocket.onclose = () => {
+        console.log("连接已关闭...")
+        this.webSocket = null
+    }
+    this.webSocket.onerror = () => {
+        floatDialog('连接服务器错误...')
+    }
+}
+
+StartScene.prototype.roomDialog = dialog({
+    width: '300px',
+    okValue: '开始游戏',
+    ok: () => {
+        //todo
+    },
+    close: () => {
+    }
+})
+
+StartScene.prototype.updateRoomInfo = function (roomInfo) {
+    var roomContentHtml = createRoomHtml(roomInfo);
+    this.roomDialog.title('房间号：' + this.params.roomNum)
+    this.roomDialog.content(roomContentHtml)
+    this.roomDialog.showModal()
+}
+
+function createRoomHtml(roomInfo) {
+    var data = ''
+    roomInfo.forEach((v, i) => {
+        data += '' +
+            '<tr>' +
+            '   <th scope="row">' + (i + 1) + '</th>' +
+            '   <td>' + v + '</td>' +
+            '</tr>'
+    })
+    return '' +
+        '<table class="table table-striped">' +
+        '  <thead>' +
+        '        <tr>' +
+        '          <th>#</th>' +
+        '          <th>游戏id</th>' +
+        '        </tr>' +
+        '      </thead>' +
+        '      <tbody>' +
+        data +
+        '      </tbody>' +
+        '</table>'
 }
 
 var contentHtml = '' +
