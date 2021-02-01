@@ -172,13 +172,13 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
                 success: ret => {
                     console.log(ret)
                     if (ret.code === 0 && ret.data) {
-                        loading.close().remove()
                         console.log('load next scene...')
                         this.params.roomNum = ret.data//保存房间号
                         this.connect()
                     } else {
                         floatDialog(ret.msg)
                     }
+                    loading.close().remove()
                 },
                 error: ret => {
                     loading.close().remove()
@@ -229,6 +229,20 @@ StartScene.prototype.connect = function () {
     this.webSocket.onopen = () => {
         console.log("进入房间...")
         loading.close().remove()
+        this.roomDialog = dialog({
+            width: '300px',
+            okValue: '开始游戏',
+            ok: () => {
+                //todo
+            },
+            cancelValue: '退出',
+            cancel: () => {
+                console.log("关闭连接")
+                this.webSocket.close()
+            }
+        })
+        this.roomDialog.showModal()
+
     }
     this.webSocket.onmessage = (ret) => {
         console.log("收到服务端消息")
@@ -255,21 +269,11 @@ StartScene.prototype.connect = function () {
     }
 }
 
-StartScene.prototype.roomDialog = dialog({
-    width: '300px',
-    okValue: '开始游戏',
-    ok: () => {
-        //todo
-    },
-    close: () => {
-    }
-})
 
 StartScene.prototype.updateRoomInfo = function (roomInfo) {
     var roomContentHtml = createRoomHtml(roomInfo);
     this.roomDialog.title('房间号：' + this.params.roomNum)
     this.roomDialog.content(roomContentHtml)
-    this.roomDialog.showModal()
 }
 
 function createRoomHtml(roomInfo) {
