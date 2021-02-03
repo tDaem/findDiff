@@ -51,10 +51,12 @@ public class GameWebsocketController {
      */
     @OnOpen
     public void onOpen(@PathParam("roomNum") int roomNum, Session session) throws IOException {
-        logger.info(session.getRequestParameterMap().get("serialNum") + "进入房间");
         //将用户加入该房间
         Map<Integer, List<Session>> rooms = RoomService.getRooms();
-        rooms.get(roomNum).add(session);
+        if (!rooms.get(roomNum).contains(session)) {
+            logger.info(session.getRequestParameterMap().get("serialNum") + "进入房间");
+            rooms.get(roomNum).add(session);
+        }
         boolean mutilPlay = false;
         List<String> mutilPlays = session.getRequestParameterMap().get("mutilPlay");
         if (mutilPlays != null && mutilPlays.size() > 0) {
@@ -74,10 +76,11 @@ public class GameWebsocketController {
 
     /**
      * 推送房间中的用户
+     *
      * @param roomNum
      */
     private void broadcast(int roomNum) throws Exception {
-        List<String> gameNames =  new ArrayList<>();
+        List<String> gameNames = new ArrayList<>();
         this.serialDao = applicationContext.getBean(SerialDao.class);
         for (Session session : RoomService.getRooms().get(roomNum)) {
             String gameName = session.getRequestParameterMap().get("gameName").get(0);
@@ -122,13 +125,16 @@ public class GameWebsocketController {
      * @throws IOException
      */
     @OnMessage
-    public void onMessage(@PathParam("roomNum") int roomNum, String message, Session session) throws IOException {
+    public void onMessage(@PathParam("roomNum") int roomNum, String message, Session session) {
         try {
-            //广播坐标
             logger.info("收到客户端的消息：" + message);
-            DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
-            putData(roomNum, diffsCoordinate);
-            broadcast(roomNum, session, Message.DATA(RoomService.getRoomDatas(roomNum)));
+            if ("startGame".equals(message)) {//开始游戏
+                startGame(roomNum, Message.DATA(message));
+            } else {//广播坐标
+                DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
+                putData(roomNum, diffsCoordinate);
+                broadcast(roomNum, session, Message.DATA(RoomService.getRoomDatas(roomNum)));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,6 +161,24 @@ public class GameWebsocketController {
 
         for (Session session : RoomService.getRooms().get(roomNum)) {
             if (!onOpen && session.equals(self)) continue;
+            try {
+                session.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 推送开始游戏消息
+     *
+     * @param roomNum
+     * @param message
+     * @param <T>
+     */
+    private static <T> void startGame(int roomNum, ResponseResult<Message<T>> message) {
+
+        for (Session session : RoomService.getRooms().get(roomNum)) {
             try {
                 session.getBasicRemote().sendObject(message);
             } catch (IOException | EncodeException e) {

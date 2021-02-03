@@ -72,6 +72,8 @@ GameScene.prototype.load = function (prevScene, params) {
     console.log(params)
     this.params = params
     this.connect(prevScene)
+    this.initGame(prevScene)
+
 }
 
 /***
@@ -81,17 +83,16 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function (prevScene) {
     //建立长连接
     if ('WebSocket' in window) {
-        if (!this.webSocket)
-            this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
+        if (!Scene.webSocket)
+            Scene.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
     } else {
         alert('当前浏览器不支持WebSocket！')
         return
     }
-    this.webSocket.onopen = () => {
+    Scene.webSocket.onopen = () => {
         console.log("进入房间...")
-        this.initGame(prevScene)
     }
-    this.webSocket.onmessage = (ret) => {
+    Scene.webSocket.onmessage = (ret) => {
         console.log("收到服务端消息")
         console.log(ret.data)
         var msg = JSON.parse(ret.data)
@@ -107,11 +108,11 @@ GameScene.prototype.connect = function (prevScene) {
             }
         }
     }
-    this.webSocket.onclose = () => {
+    Scene.webSocket.onclose = () => {
         console.log("连接已关闭...")
-        this.webSocket = null
+        Scene.webSocket = null
     }
-    this.webSocket.onerror = () => {
+    Scene.webSocket.onerror = () => {
         console.log("连接错误...")
     }
 }
@@ -136,7 +137,7 @@ GameScene.prototype.clickListener = function (x, y) {
     if (this.differences.check(x, y)) {
         //蓝底变色
         // this.label.decrease()
-        this.webSocket.send(JSON.stringify({
+        Scene.webSocket.send(JSON.stringify({
             x: x,
             y: y
         }))

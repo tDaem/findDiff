@@ -132,7 +132,7 @@ StartScene.prototype.processCreateRoom = function (preDialog) {
             if (ret.code === 0 && ret.data) {
                 console.log('load next scene...')
                 this.params.roomNum = ret.data//保存房间号
-                this.connect()
+                this.connect(true)
             } else {
                 floatDialog('创建房间失败，请稍后重试！')
             }
@@ -174,7 +174,7 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
                     if (ret.code === 0 && ret.data) {
                         console.log('load next scene...')
                         this.params.roomNum = ret.data//保存房间号
-                        this.connect()
+                        this.connect(false)
                     } else {
                         floatDialog(ret.msg)
                     }
@@ -214,57 +214,64 @@ var floatDialog = function (msg) {
     }, 2000);
 }
 
-StartScene.prototype.connect = function () {
+StartScene.prototype.connect = function (showStartBtn) {
     var loading = dialog()
     loading.showModal()
     //建立长连接
     if ('WebSocket' in window) {
-        if (!this.webSocket)
-            this.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
+        if (!Scene.webSocket)
+            Scene.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
     } else {
         loading.close().remove()
         alert('当前浏览器不支持WebSocket！')
         return
     }
-    this.webSocket.onopen = () => {
+    Scene.webSocket.onopen = () => {
         console.log("进入房间...")
         loading.close().remove()
-        this.roomDialog = dialog({
+        var dialogParams = {
             width: '300px',
-            okValue: '开始游戏',
-            ok: () => {
-                //todo
-            },
             cancelValue: '退出',
             cancel: () => {
                 console.log("关闭连接")
-                this.webSocket.close()
+                Scene.webSocket.close()
             }
-        })
+        }
+        if (showStartBtn) {
+            dialogParams.okValue = '开始游戏';
+            dialogParams.ok = () => {
+                Scene.webSocket.send('startGame')
+            }
+        }
+        this.roomDialog = dialog(dialogParams)
         this.roomDialog.showModal()
 
     }
-    this.webSocket.onmessage = (ret) => {
+    Scene.webSocket.onmessage = (ret) => {
         console.log("收到服务端消息")
         console.log(ret.data)
         var msg = JSON.parse(ret.data)
         if (msg.code === 0) {
-            if (msg.data.messageType === 'TIP') {
-                //弹出消息，进入游戏
+            if (msg.data.messageType === 'TIP') {//提示性的消息
                 console.log(msg.data.data)
             } else if (msg.data.messageType === 'DATA') {
                 //处理数据
-                this.updateRoomInfo(msg.data.data)
+                if (msg.data.data === 'startGame') {//开始游戏
+                    this.roomDialog.close().remove()
+                    this.game.loadGameScene(this, this.params)
+                } else {//更新房间信息
+                    this.updateRoomInfo(msg.data.data)
+                }
             } else {
                 console.log("游戏异常！")
             }
         }
     }
-    this.webSocket.onclose = () => {
+    Scene.webSocket.onclose = () => {
         console.log("连接已关闭...")
-        this.webSocket = null
+        Scene.webSocket = null
     }
-    this.webSocket.onerror = () => {
+    Scene.webSocket.onerror = () => {
         floatDialog('连接服务器错误...')
     }
 }

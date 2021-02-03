@@ -4,8 +4,9 @@
 function Scene(game, img) {
     this.game = game
     this.img = img
-    this.webSocket = null
 }
+
+Scene.webSocket = null
 
 // 加载游戏场景
 // append控制加载的位置，以便实现丰富的动画效果
