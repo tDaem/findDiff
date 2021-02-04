@@ -83,7 +83,36 @@ StartScene.prototype.load = function (prevScene, params) {
  * 单人游戏按钮点击事件
  */
 StartScene.prototype.soloGameBtnClick = function () {
-    this.game.loadGameScene(this, this.params)
+    var loading = dialog({
+        content: "正在进入游戏，请稍后..."
+    })
+    loading.showModal()
+    $.ajax({
+        url: "/room",
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        success: ret => {
+            console.log(ret)
+            loading.close().remove()
+            if (ret.code === 0 && ret.data) {
+                console.log('load next scene...')
+                this.params.roomNum = ret.data//保存房间号
+                this.game.loadGameScene(this, this.params)
+            } else {
+                floatDialog('进入游戏失败，请稍后重试！')
+            }
+        },
+        error: ret => {
+            console.log(ret)
+            loading.close().remove()
+            if (ret.status == 'timeout') {
+                floatDialog('请求超时，请检查网络！')
+            } else {
+                floatDialog('服务器异常！')
+            }
+        }
+    })
 }
 
 /**

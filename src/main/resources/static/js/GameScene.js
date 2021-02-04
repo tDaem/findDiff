@@ -80,7 +80,7 @@ GameScene.prototype.load = function (prevScene, params) {
  * 连接服务器
  * @param prevScene
  */
-GameScene.prototype.connect = function (prevScene) {
+GameScene.prototype.connect = function () {
     //建立长连接
     if ('WebSocket' in window) {
         if (!Scene.webSocket)
