@@ -6,22 +6,17 @@ import com.daem.finddiff.dao.SerialDao;
 import com.daem.finddiff.dto.Message;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
-import com.daem.finddiff.entity.GameUser;
 import com.daem.finddiff.service.RoomService;
-import com.daem.finddiff.service.SerialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description c处理游戏场景时的联网数据
@@ -129,7 +124,9 @@ public class GameWebsocketController {
         try {
             logger.info("收到客户端的消息：" + message);
             if ("startGame".equals(message)) {//开始游戏
-                startGame(roomNum, Message.DATA(message));
+                sendStrMsg(roomNum, Message.DATA(message));
+            } else if ("next".equals(message)) {
+                sendStrMsg(roomNum, Message.DATA(message));
             } else {//广播坐标
                 DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
                 putData(roomNum, diffsCoordinate);
@@ -176,7 +173,7 @@ public class GameWebsocketController {
      * @param message
      * @param <T>
      */
-    private static <T> void startGame(int roomNum, ResponseResult<Message<T>> message) {
+    private static <T> void sendStrMsg(int roomNum, ResponseResult<Message<T>> message) {
 
         for (Session session : RoomService.getRooms().get(roomNum)) {
             try {

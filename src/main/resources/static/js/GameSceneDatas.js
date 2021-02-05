@@ -1,5 +1,6 @@
 Game.GameSceneDatas = [
     {
+        id: 1,
         src: 'images/lr.jpg',
         structure: 'LEFT_AND_RIGHT',
         diffs: [
@@ -20,6 +21,7 @@ Game.GameSceneDatas = [
             }]
     },
     {
+        id: 2,
         src: 'images/tb.jpg',
         structure: 'UP_AND_DOWN',
         diffs: [

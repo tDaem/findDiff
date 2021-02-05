@@ -12,8 +12,29 @@ function GameScene(game, datas) {
     } else {
         $(game.box).css(game.LR)
     }
+    this.diffIndex = 0
+    /**
+     * 保存游戏数据
+     * {
+     *     start: false,//是否开始游戏时
+     *     skip: false, //是否跳过
+     *     diffIndex: 0,//第几处不同
+     *     gameSceneData: {//当前游戏场景
+     *         id: 1
+     *     },
+     *     serial: {//当前游戏序列号
+     *         id: 2
+     *     },
+     *     time: new Date()//当前操作的时间
+     *     hit: 是否命中不同点
+     * }
+     */
+    this.records = []
     Scene.call(this, game, this.data.src)
 }
+
+
+GameScene.prototype.records = []
 
 // 构造原型链
 GameScene.prototype = Object.create(Scene.prototype)
@@ -61,6 +82,21 @@ GameScene.prototype.initGame = function (prevScene) {
         console.log('game scene loaded')
         prevScene.unload()
         // this.secondManager.start()
+        this.records.push({
+            roomNum: this.params.roomNum,
+            start: true,//是否开始游戏时
+            skip: false,//跳过
+            diffIndex: this.diffIndex,//第几处不同
+            gameSceneData: {//当前游戏场景
+                id: this.data.id
+            },
+            serial: {//当前游戏序列号
+                id: this.params.serial.id
+            },
+            time: new Date().getTime(),//当前操作的时间
+            hit: false//是否命中不同点
+        })
+        console.log(this.records)
     })
 }
 
@@ -101,8 +137,13 @@ GameScene.prototype.connect = function () {
                 //弹出消息，进入游戏
                 console.log(msg.data.data)
             } else if (msg.data.messageType === 'DATA') {
-                //处理数据
-                this.processData(msg.data.data)
+                if (msg.data.data === 'next') {//跳过这一关
+                    this.next()
+                } else {
+                    //处理数据
+                    this.processData(msg.data.data)
+                }
+
             } else {
                 console.log("游戏异常！")
             }
@@ -130,11 +171,38 @@ GameScene.prototype.processData = function (data) {
 // 重写点击监听函数
 GameScene.prototype.clickListener = function (x, y) {
     console.log('game scene click!')
-
+    let boxWidth = $(this.game.box).width();
+    let boxHeight = $(this.game.box).height();
+    if (this.data.structure === 'LEFT_AND_RIGHT') {//左右结构的图片
+        if (x < boxWidth / 2) {
+            x = x + boxWidth / 2
+        }
+    } else {//上下结构的图片
+        if (y < boxHeight / 2) {
+            y = y + boxHeight / 2
+        }
+    }
+    var record = {
+        roomNum: this.params.roomNum,
+        start: false,//是否开始游戏时
+        skip: false,//跳过
+        diffIndex: this.diffIndex,//第几处不同
+        gameSceneData: {//当前游戏场景
+            id: this.data.id
+        },
+        serial: {//当前游戏序列号
+            id: this.params.serial.id
+        },
+        time: new Date().getTime(),//当前操作的时间
+        hit: false//是否命中不同点
+    }
     /**
      * 将正确的数据发送到后台
      */
     if (this.differences.check(x, y)) {
+        record.start = false
+        record.diffIndex = ++this.diffIndex
+        record.hit = true
         //蓝底变色
         // this.label.decrease()
         Scene.webSocket.send(JSON.stringify({
@@ -142,14 +210,29 @@ GameScene.prototype.clickListener = function (x, y) {
             y: y
         }))
     } else {
+        var flag = boxWidth > boxHeight
         var errorLeft = x - radius
         var errorTop = y - radius
-        var errorLeft_1 = x - radius - $(this.game.box).width() / 2
-        var errorTop_1 = y - radius
+        var errorLeft_1
+        var errorTop_1
+        if (flag) {
+            errorLeft_1 = x - radius - boxWidth / 2
+            errorTop_1 = y - radius
+        } else {
+            errorLeft_1 = x - radius
+            errorTop_1 = y - radius - boxHeight/2
+        }
+
         this.differences.show(null, errorLeft, errorTop)
-        //左边也同时画圈
+        //对称部分也同时画圈
         this.differences.show(null, errorLeft_1, errorTop_1)
+
+        record.start = false
+        record.diffIndex = this.diffIndex
+        record.hit = false
     }
+    this.records.push(record)
+    console.log(this.records)
 }
 
 /**
@@ -169,7 +252,8 @@ GameScene.prototype.reset = function (start) {
     // this.label.set(this.pass.bind(this), this.data.fakeCnt || this.data.diffs.length)
     // this.secondManager.set(this.timeout.bind(this), this.data.seconds)
     this.differences.reset()
-
+    this.records = []
+    this.diffIndex = 0
     // 从超时场景返回时需要再次将游戏的点击监听函数切换成游戏场景的监听函数
     this.game.clickListener = this.clickListener.bind(this)
 
@@ -207,7 +291,23 @@ GameScene.prototype.skip = function () {
         content: '确定跳过这一关吗？',
         okValue: '确定',
         ok: function () {
-            this.next()
+            this.records.push({
+                roomNum: this.params.roomNum,
+                start: false,//是否开始游戏时
+                skip: true,//跳过
+                diffIndex: this.diffIndex,//第几处不同
+                gameSceneData: {//当前游戏场景
+                    id: this.data.id
+                },
+                serial: {//当前游戏序列号
+                    id: this.params.serial.id
+                },
+                time: new Date().getTime(),//当前操作的时间
+                hit: false//是否命中不同点
+            })
+            console.log(this.records)
+            //发送消息
+            Scene.webSocket.send('next')
             return true;
         }.bind(this),//修改this指向
         cancelValue: '取消',
@@ -226,6 +326,8 @@ GameScene.prototype.skip = function () {
  * 没有就通关
  */
 GameScene.prototype.next = function () {
+    this.saveRecord(this.records)
+
     if (++this.index < this.datas.length) {
         this.data = this.datas[this.index]
         var ele = this.$ele
@@ -274,4 +376,32 @@ GameScene.prototype.pass = function (label, preview) {
 
 
     this.next()
+}
+
+/**
+ * 保存记录到后台
+ * @param records
+ */
+GameScene.prototype.saveRecord = (records) => {
+    console.log(JSON.stringify(records))
+    $.ajax({
+        url: "/record",
+        type: 'post',
+        timeout: 12000,
+        dataType: 'json',
+        data: JSON.stringify(records),
+        contentType: 'application/json;charset=UTF-8',
+        success: ret => {
+            console.log(ret)
+            if (ret.code === 0 && ret.data) {
+                //忽略
+            } else {
+                floatDialog('数据保存失败')
+            }
+        },
+        error: ret => {
+            console.log(ret)
+            floatDialog('与服务器通讯失败，数据可能丢失！')
+        }
+    })
 }

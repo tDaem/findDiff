@@ -25,8 +25,17 @@ Differences.prototype.check = function (x, y) {
 
         if (x > left && x < right && y > top && y < bottom) {
             // 如果坐标点中“不同”，使用相关数据画圈
-            var left_1 = diff.center.x - radius - $(this.game.box).width() / 2
-            var top_1 = diff.center.y - radius
+            var flag = $(this.game.box).width() > $(this.game.box).height()
+            var left_1
+            var top_1
+            if (flag){
+                left_1 = diff.center.x - radius - $(this.game.box).width() / 2
+                top_1 = diff.center.y - radius
+            }else {
+                left_1 = diff.center.x - radius
+                top_1 = diff.center.y - radius - $(this.game.box).height() / 2
+            }
+
             this.show(diff, left, top)
             //左边也同时画圈
             this.show(diff, left_1, top_1)
