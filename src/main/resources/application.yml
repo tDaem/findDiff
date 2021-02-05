@@ -20,6 +20,8 @@ spring:
     show-sql: true
 #    database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+
 file:
-  path: E:/upload/
+  path: E:/upload/ #图片上传的存放路径
 

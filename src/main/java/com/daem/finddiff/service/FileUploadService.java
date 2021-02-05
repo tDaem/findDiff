@@ -25,8 +25,8 @@ public class FileUploadService {
         try {
             String extName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
             String fileName = UUID.randomUUID().toString() + extName;
-            FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(new File(filePath)));
-            return ResponseResult.defSuccessful(fileName);
+            FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(new File(filePath + fileName)));
+            return ResponseResult.defSuccessful("/upload/" + fileName);
         } catch (Exception e) {
             return ResponseResult.defFailed("文件上传失败！", e.getMessage());
         }
