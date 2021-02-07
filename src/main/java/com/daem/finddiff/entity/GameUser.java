@@ -1,5 +1,6 @@
 package com.daem.finddiff.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,9 +17,6 @@ import java.util.Date;
  */
 @Entity
 @Table
-@Getter
-@Setter
-@ToString
 public class GameUser {
 
     /**
@@ -38,6 +36,7 @@ public class GameUser {
      * 该用户玩的游戏对应的序列号id
      */
     @OneToOne(fetch=FetchType.EAGER)
+    @JsonBackReference
     private Serial serial;
 
 }

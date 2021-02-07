@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.2</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]--></head>
+
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form id="game-scene-form" class="layui-form">
+            <div class="layui-form-item">
+                <label for="L_name" class="layui-form-label">
+                    <span></span>关卡名：</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="L_name" name="gameSceneName" autocomplete="off"
+                           class="layui-input"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_image" class="layui-form-label">
+                    <span class="x-red">*</span>图片：</label>
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn" id="L_image">上传图片</button>
+                    <div class="layui-upload-list" style="margin-left: 110px;">
+                        <img style="max-height: 180px;max-width: 112px;" class="layui-upload-img" id="img">
+                        <p id="demoText"></p>
+                    </div>
+                </div>
+                <input id="imgPath" name="imgPath" type="hidden" lay-verify="imgPath">
+            </div>
+            <div class="layui-form-item">
+                <label for="L_image" class="layui-form-label">
+                    <span class="x-red">*</span>坐标：
+                </label>
+                <div id="diffsCoordinates" class="layui-input-block">
+
+                </div>
+                <input type="button" id="addCoordinate" class="layui-btn layui-btn-primary" style="margin-left: 111px"
+                       value="增加坐标"/>
+            </div>
+            <div class="layui-form-item layui-col-lg-offset10">
+                <label class="layui-form-label"></label>
+                <button style="margin-top: 50px;" class="layui-btn" lay-filter="add" lay-submit="">完成</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="./js/game-scene-edit.js"></script>
+<!--<script>var _hmt = _hmt || [];
+(function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();</script>-->
+</body>
+
+</html>

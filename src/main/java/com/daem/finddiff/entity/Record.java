@@ -1,5 +1,7 @@
 package com.daem.finddiff.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,9 +18,6 @@ import java.util.Date;
  */
 @Entity
 @Table
-@Getter
-@Setter
-@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Record {
 
@@ -73,4 +72,84 @@ public class Record {
      */
     @CreatedDate
     private Date createTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public boolean isStart() {
+        return start;
+    }
+
+    public void setStart(boolean start) {
+        this.start = start;
+    }
+
+    public boolean isSkip() {
+        return skip;
+    }
+
+    public void setSkip(boolean skip) {
+        this.skip = skip;
+    }
+
+    public int getDiffIndex() {
+        return diffIndex;
+    }
+
+    public void setDiffIndex(int diffIndex) {
+        this.diffIndex = diffIndex;
+    }
+
+    public GameSceneData getGameSceneData() {
+        return gameSceneData;
+    }
+
+    public void setGameSceneData(GameSceneData gameSceneData) {
+        this.gameSceneData = gameSceneData;
+    }
+
+    public Serial getSerial() {
+        return serial;
+    }
+
+    public void setSerial(Serial serial) {
+        this.serial = serial;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public boolean isHit() {
+        return hit;
+    }
+
+    public void setHit(boolean hit) {
+        this.hit = hit;
+    }
+
+    public Integer getRoomNum() {
+        return roomNum;
+    }
+
+    public void setRoomNum(Integer roomNum) {
+        this.roomNum = roomNum;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 }

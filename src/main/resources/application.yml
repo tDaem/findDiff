@@ -7,7 +7,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://167.179.106.197/demo?userUnicode=true&characterEncodeing=utf-8&useSSL=false&serverTimezone=UTC
+    #    url: jdbc:mysql://167.179.106.197/demo?userUnicode=true&characterEncodeing=utf-8&useSSL=false&serverTimezone=UTC
     url: jdbc:mysql://localhost/demo?userUnicode=true&characterEncodeing=utf-8&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
@@ -18,8 +18,15 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL5Dialect
     show-sql: true
-#    database: mysql
+    #    database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB # 单个文件的最大值
+      max-request-size: 100MB # 上传文件总的最大值
+
 
 
 file:

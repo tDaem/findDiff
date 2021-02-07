@@ -1,5 +1,7 @@
 package com.daem.finddiff.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,9 +20,6 @@ import java.util.List;
  */
 @Entity
 @Table
-@Getter
-@Setter
-@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Serial {
 
@@ -63,4 +62,53 @@ public class Serial {
      */
     @LastModifiedDate
     private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public SerialStatus getSerialStatus() {
+        return serialStatus;
+    }
+
+    public void setSerialStatus(SerialStatus serialStatus) {
+        this.serialStatus = serialStatus;
+    }
+
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }

@@ -209,6 +209,7 @@ GameScene.prototype.clickListener = function (x, y) {
             x: x,
             y: y
         }))
+
     } else {
         var flag = boxWidth > boxHeight
         var errorLeft = x - radius
@@ -220,7 +221,7 @@ GameScene.prototype.clickListener = function (x, y) {
             errorTop_1 = y - radius
         } else {
             errorLeft_1 = x - radius
-            errorTop_1 = y - radius - boxHeight/2
+            errorTop_1 = y - radius - boxHeight / 2
         }
 
         this.differences.show(null, errorLeft, errorTop)
@@ -233,6 +234,10 @@ GameScene.prototype.clickListener = function (x, y) {
     }
     this.records.push(record)
     console.log(this.records)
+    if (this.data.diffs.length === this.diffIndex)
+        setTimeout(() => {
+            this.next()
+        }, 1000)
 }
 
 /**

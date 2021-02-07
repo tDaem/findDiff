@@ -1,8 +1,7 @@
 package com.daem.finddiff.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,9 +17,6 @@ import java.util.List;
  */
 @Entity
 @Table
-@Getter
-@Setter
-@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class GameSceneData {
 
@@ -32,10 +28,14 @@ public class GameSceneData {
     private Integer id;
 
     /**
+     * 关卡名
+     */
+    private String gameSceneName;
+    /**
      * 该找不同的图片url
      */
     @Column(nullable = false)
-    private String imgUrl;
+    private String imgPath;
 
     /**
      * 图片的结构
@@ -47,10 +47,12 @@ public class GameSceneData {
     /**
      * 不同点再图片上的坐标
      */
-    @OneToMany(mappedBy = "gameSceneData")
+    @OneToMany(mappedBy = "gameSceneData", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<DiffsCoordinate> diffsCoordinates;
 
     @ManyToMany(mappedBy = "gameSceneDatas")
+    @JsonIgnore
     private List<Game> games;
 
     /**
@@ -65,4 +67,67 @@ public class GameSceneData {
     @LastModifiedDate
     private Date updateTime;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getGameSceneName() {
+        return gameSceneName;
+    }
+
+    public void setGameSceneName(String gameSceneName) {
+        this.gameSceneName = gameSceneName;
+    }
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    public Structure getStructure() {
+        return structure;
+    }
+
+    public void setStructure(Structure structure) {
+        this.structure = structure;
+    }
+
+    public List<DiffsCoordinate> getDiffsCoordinates() {
+        return diffsCoordinates;
+    }
+
+    public void setDiffsCoordinates(List<DiffsCoordinate> diffsCoordinates) {
+        this.diffsCoordinates = diffsCoordinates;
+    }
+
+    public List<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(List<Game> games) {
+        this.games = games;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }

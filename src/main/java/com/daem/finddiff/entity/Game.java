@@ -1,5 +1,8 @@
 package com.daem.finddiff.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,9 +21,6 @@ import java.util.List;
  */
 @Entity
 @Table
-@Getter
-@Setter
-@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Game {
 
@@ -53,4 +53,44 @@ public class Game {
      */
     @LastModifiedDate
     private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
+
+    public List<GameSceneData> getGameSceneDatas() {
+        return gameSceneDatas;
+    }
+
+    public void setGameSceneDatas(List<GameSceneData> gameSceneDatas) {
+        this.gameSceneDatas = gameSceneDatas;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }
