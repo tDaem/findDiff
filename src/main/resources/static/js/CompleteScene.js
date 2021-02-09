@@ -23,10 +23,10 @@ CompleteScene.prototype.load = function(append, params){
 // 重写点击事件监听函数，点击重新开始时加载开始场景，
 // 让游戏通关图片上滑并卸载通关场景
 CompleteScene.prototype.clickListener = function(x, y){
-    if(x > 351 && x < 548 && y > 480 && y < 551){
+    /*if(x > 351 && x < 548 && y > 480 && y < 551){
         this.game.loadStartScene()
         this.$ele.slideUp(1000, function(){
             this.unload()
         }.bind(this))
-    }
+    }*/
 }

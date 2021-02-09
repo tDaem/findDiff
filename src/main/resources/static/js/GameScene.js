@@ -133,7 +133,7 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function () {
     //建立长连接
     if ('WebSocket' in window) {
-        if (!Scene.webSocket){
+        if (!Scene.webSocket) {
             var Ip = window.location.host
             Scene.webSocket = new WebSocket("ws://" + Ip + "/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
         }
@@ -181,6 +181,11 @@ GameScene.prototype.processData = function (data) {
     console.log(data)
     data.forEach((v, i) => {
         this.differences.check(v.x, v.y)
+        this.diffIndex++
+        if (this.data.diffsCoordinates.length === this.diffIndex)
+            setTimeout(() => {
+                this.next()
+            }, 1000)
     })
 }
 

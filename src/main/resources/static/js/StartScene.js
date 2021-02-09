@@ -93,6 +93,7 @@ StartScene.prototype.soloGameBtnClick = function () {
             if (ret.code === 0 && ret.data) {
                 console.log('load next scene...')
                 this.params.roomNum = ret.data//保存房间号
+                changeSerialStatus(this.params.serial, 'IN_PROGRESS')
                 this.game.loadGameScene(this, this.params)
             } else {
                 floatDialog('进入游戏失败，请稍后重试！')
@@ -225,6 +226,27 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
 }
 
 /**
+ * 开始游戏后改变序列号的状态为已开始游戏
+ * @param serialId
+ */
+function changeSerialStatus(serial, status) {
+    console.log(serial)
+    $.ajax({
+        url: '/updateStatus?serialId=' + serial.id + "&serialStatus=" + status,
+        type: 'put',
+        dataType: 'json',
+        success: (res) => {
+            if (res.code > 0){
+                floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
+            }
+        },
+        error: (ret) => {
+            floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
+        }
+    })
+}
+
+/**
  * 浮动的提醒消息 2秒后移除
  * @param msg
  */
@@ -243,9 +265,9 @@ StartScene.prototype.connect = function (showStartBtn) {
     loading.showModal()
     //建立长连接
     if ('WebSocket' in window) {
-        if (!Scene.webSocket){
+        if (!Scene.webSocket) {
             var Ip = window.location.host;
-            Scene.webSocket = new WebSocket("ws:/" + Ip + "//game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
+            Scene.webSocket = new WebSocket("ws://" + Ip + "/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
         }
     } else {
         loading.close().remove()

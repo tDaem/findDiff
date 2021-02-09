@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -29,4 +31,13 @@ public class RecordService {
         }
     }
 
+    public ResponseResult<Map<Integer,Map<Integer,List<Record>>>> getRecordsByGameId(Integer gameId) {
+        try {
+            List<Record> records = recordDao.findAllBySerial_Game_Id(gameId);
+            Map<Integer, Map<Integer, List<Record>>> collect = records.stream().collect(Collectors.groupingBy(Record::getRoomNum, Collectors.groupingBy(record -> record.getGameSceneData().getId())));
+            return ResponseResult.defSuccessful(collect);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
 }

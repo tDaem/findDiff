@@ -59,7 +59,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                     success: (ret) => {
                         console.log(ret)
                         if (ret.code > 0)
-                            return layer.msg('新增失败')
+                            return layer.msg(ret.msg)
                         layer.alert("增加成功", {
                                 icon: 6
                             },

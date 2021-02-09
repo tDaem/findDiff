@@ -53,6 +53,11 @@ public class Serial {
     private Game game;
 
     /**
+     * 此序列号用户玩游戏时的用户名
+     */
+    private String userName;
+
+    /**
      * 该实体创建的时间
      */
     @CreatedDate
@@ -88,7 +93,6 @@ public class Serial {
         this.serialStatus = serialStatus;
     }
 
-
     public Game getGame() {
         return game;
     }
@@ -111,5 +115,13 @@ public class Serial {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

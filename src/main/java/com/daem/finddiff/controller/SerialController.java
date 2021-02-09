@@ -3,6 +3,7 @@ package com.daem.finddiff.controller;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Game;
 import com.daem.finddiff.entity.Serial;
+import com.daem.finddiff.entity.SerialStatus;
 import com.daem.finddiff.service.SerialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,8 @@ public class SerialController {
     private SerialService serialService;
 
     @GetMapping("/serial")
-    public ResponseResult<Serial> getSerialBySerial(String serialNum){
-        return serialService.getSerialBySerial(serialNum);
+    public ResponseResult<Serial> getSerialBySerial(String serialNum, String userName){
+        return serialService.getSerialBySerial(serialNum, userName);
     }
 
     @GetMapping("/serial/{id}")
@@ -70,5 +71,10 @@ public class SerialController {
     @PutMapping(value = "/serial", produces = "application/json;charset=UTF-8")
     public ResponseResult<Serial> updateSerial(@RequestBody Serial serial) {
         return serialService.updateSerial(serial);
+    }
+
+    @PutMapping(value = "/updateStatus")
+    public ResponseResult<Serial> updateSerialStatus(Integer serialId, SerialStatus serialStatus) {
+        return serialService.updateSerialBySerialId(serialId, serialStatus);
     }
 }

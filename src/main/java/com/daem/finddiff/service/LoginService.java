@@ -1,7 +1,6 @@
 package com.daem.finddiff.service;
 
 import com.daem.finddiff.dao.SerialDao;
-import com.daem.finddiff.dao.UserDao;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Serial;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,6 @@ public class LoginService {
 
     @Autowired
     private SerialDao serialDao;
-
-    @Autowired
-    private UserDao userDao;
 
     public ResponseResult<Boolean> login(String gameId, String serialNum) {
         Serial serialEntity = null;

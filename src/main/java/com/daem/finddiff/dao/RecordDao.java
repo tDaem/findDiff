@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author tyx
@@ -21,4 +23,6 @@ public interface RecordDao extends JpaRepository<Record, Integer> {
     @Modifying
     @Query("DELETE FROM Record r WHERE r.gameSceneData.id IN :ids")
     void delByIds(Integer[] ids);
+
+    List<Record> findAllBySerial_Game_Id(Integer gameId);
 }
