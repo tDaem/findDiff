@@ -2,8 +2,10 @@
 // 画圈及管理圆圈
 
 function Differences(game, data) {
+    console.log(game)
+    console.log(data)
     this.game = game
-    this.diffs = data.diffs
+    this.diffs = data.diffsCoordinates
 }
 
 // 判断x,y坐标点是否在“不同”数据中
@@ -18,10 +20,10 @@ Differences.prototype.check = function (x, y) {
         // 继续循环下一个不同！
 
         // 计算“不同”区域
-        var left = diff.center.x - radius
-        var right = diff.center.x + radius
-        var top = diff.center.y - radius
-        var bottom = diff.center.y + radius
+        var left = diff.x - radius
+        var right = diff.x + radius
+        var top = diff.y - radius
+        var bottom = diff.y + radius
 
         if (x > left && x < right && y > top && y < bottom) {
             // 如果坐标点中“不同”，使用相关数据画圈
@@ -29,11 +31,11 @@ Differences.prototype.check = function (x, y) {
             var left_1
             var top_1
             if (flag){
-                left_1 = diff.center.x - radius - $(this.game.box).width() / 2
-                top_1 = diff.center.y - radius
+                left_1 = diff.x - radius - $(this.game.box).width() / 2
+                top_1 = diff.y - radius
             }else {
-                left_1 = diff.center.x - radius
-                top_1 = diff.center.y - radius - $(this.game.box).height() / 2
+                left_1 = diff.x - radius
+                top_1 = diff.y - radius - $(this.game.box).height() / 2
             }
 
             this.show(diff, left, top)

@@ -21,9 +21,10 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                 console.log(res)
                 //如果上传失败
                 if (res.code > 0) {
-                    return layer.msg('上传失败',{icon: 2});
+                    return layer.msg('上传失败', {icon: 2});
+                } else {
+                    $('input[name=imgPath]').val(res.data)
                 }
-                $('input[name=imgPath]').val(res.data)
             },
             error: function () {
                 //演示失败状态，并实现重传

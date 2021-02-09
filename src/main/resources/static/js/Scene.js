@@ -6,6 +6,8 @@ function Scene(game, img) {
     this.img = img
 }
 
+
+
 Scene.webSocket = null
 
 // 加载游戏场景

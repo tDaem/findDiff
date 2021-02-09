@@ -111,8 +111,8 @@ function generateGameSceneJson() {
             x: $(Xs[i]).val(),
             y: $(Ys[i]).val()
         }
-        if ($(ids).val()){
-            item.id = $(ids).val()
+        if ($(ids[i]).val()){
+            item.id = $(ids[i]).val()
         }
         diffsCoordinates.push(item)
     })
@@ -137,28 +137,30 @@ function initData() {
             $('#imgPath').val(res.data.imgPath)
             $('#img').attr('src', res.data.imgPath)
             $.each(res.data.diffsCoordinates, function (ind, item) {
-                $('#diffsCoordinates').append(
-                    '<div>' +
-                    '                       <input type="hidden" name="coordinateId" autocomplete="off" class="layui-input" value="' + item.id + '">' +
-                    '                       <div class="layui-inline">' +
-                    '                            <label class="layui-form-label" style="width: 10px">X：</label>' +
-                    '                            <div class="layui-input-inline" style="width: 80px;">' +
-                    '                                <input lay-verify="required" type="number" name="X" autocomplete="off" class="layui-input" value="' + item.x + '">' +
-                    '                            </div>' +
-                    '                        </div>' +
-                    '                        <div class="layui-inline">' +
-                    '                            <label class="layui-form-label" style="width: 10px">Y：</label>' +
-                    '                            <div class="layui-input-inline" style="width: 80px;">' +
-                    '                                <input lay-verify="required" type="number" name="Y" autocomplete="off" class="layui-input" value="' + item.y + '">' +
-                    '                            </div>' +
-                    '                        </div>' +
+                var html = '<div>' +
+                '                       <input type="hidden" name="coordinateId" autocomplete="off" class="layui-input" value="' + item.id + '">' +
+                '                       <div class="layui-inline">' +
+                '                            <label class="layui-form-label" style="width: 10px">X：</label>' +
+                '                            <div class="layui-input-inline" style="width: 80px;">' +
+                '                                <input lay-verify="required" type="number" name="X" autocomplete="off" class="layui-input" value="' + item.x + '">' +
+                '                            </div>' +
+                '                        </div>' +
+                '                        <div class="layui-inline">' +
+                '                            <label class="layui-form-label" style="width: 10px">Y：</label>' +
+                '                            <div class="layui-input-inline" style="width: 80px;">' +
+                '                                <input lay-verify="required" type="number" name="Y" autocomplete="off" class="layui-input" value="' + item.y + '">' +
+                '                            </div>' +
+                '                        </div>' +
+                    ((ind === 0) ? '' :(
                     '                        <div class="layui-inline">' +
                     '                            <label class="layui-form-label" style="width: 0px"></label>' +
                     '                            <div class="layui-input-inline" style="width: 80px;height: 38px;">' +
                     '                                <input value="删除" type="button" autocomplete="off" class="layui-btn layui-btn-danger" onclick="deleteRow(this,' + item.id + ')"/>' +
                     '                            </div>' +
-                    '                        </div>' +
+                    '                        </div>')) +
                     '                    </div>'
+                $('#diffsCoordinates').append(
+                    html
                 )
 
             })
@@ -185,15 +187,10 @@ function deleteRow(self, id) {
             url: '/diffsCoordinate/' + id,
             type: 'delete',
             dataType: 'json',
-            success: (res) => {
-                if (res.code > 0)
-                    return layer.msg('删除失败', {icon: 2});
+            complete: (res) => {
+                console.log(res)
                 $(self).parent().parent().parent().remove()
                 layer.msg('删除成功');
-            },
-            error: (res) => {
-                console.log(res)
-                return layer.msg('删除失败', {icon: 2});
             }
         })
     }

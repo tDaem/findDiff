@@ -55,15 +55,4 @@ public class GameSceneDataController {
     public ResponseResult<Boolean> deleteAllGameSceneData(@RequestBody Integer[] ids) {
         return gameSceneDataService.deleteAllGameSceneData(ids);
     }
-//
-//    /**
-//     * 更新游戏实例
-//     *
-//     * @param game 需要更新的游戏实例
-//     * @return 如果删除成功，泛型中返回true，否则false
-//     */
-//    @PutMapping(value = "/game", produces = "application/json;charset=UTF-8")
-//    public ResponseResult<Game> updateGame(@RequestBody Game game) {
-//        return gameService.updateGame(game);
-//    }
 }

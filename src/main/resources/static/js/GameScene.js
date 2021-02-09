@@ -30,7 +30,7 @@ function GameScene(game, datas) {
      * }
      */
     this.records = []
-    Scene.call(this, game, this.data.src)
+    Scene.call(this, game, this.data.imgPath)
 }
 
 
@@ -46,10 +46,10 @@ GameScene.prototype.initGame = function (prevScene) {
         left: '0px',
         bottom: '-40px'
     })
-    this.skipBtn = new SkipButton(this.game.box, {
-        left: '852px',
-        bottom: '-40px'
-    })
+
+
+    this.skipBtn = new SkipButton(this.game.box, {})
+
     this.confirmBtn = new ConfirmButton(this.game.box, {
         left: '825px',
         bottom: '54px'
@@ -62,6 +62,20 @@ GameScene.prototype.initGame = function (prevScene) {
 
     // this.fullScreenBtn.show()
     this.skipBtn.show()
+    if (this.data.structure === 'UP_AND_DOWN') {
+        $(this.game.box).css(this.game.UD)
+        console.log(this.skipBtn)
+        this.skipBtn.$ele.css({
+            left: '565px',
+            bottom: '0'
+        })
+    } else {
+        $(this.game.box).css(this.game.LR)
+        this.skipBtn.$ele.css({
+            left: '852px',
+            bottom: '-40px'
+        })
+    }
     // this.confirmBtn.show()
     // this.secondManager.show()
     // this.label.show()
@@ -119,8 +133,10 @@ GameScene.prototype.load = function (prevScene, params) {
 GameScene.prototype.connect = function () {
     //建立长连接
     if ('WebSocket' in window) {
-        if (!Scene.webSocket)
-            Scene.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
+        if (!Scene.webSocket){
+            var Ip = window.location.host
+            Scene.webSocket = new WebSocket("ws://" + Ip + "/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum);
+        }
     } else {
         alert('当前浏览器不支持WebSocket！')
         return
@@ -234,7 +250,7 @@ GameScene.prototype.clickListener = function (x, y) {
     }
     this.records.push(record)
     console.log(this.records)
-    if (this.data.diffs.length === this.diffIndex)
+    if (this.data.diffsCoordinates.length === this.diffIndex)
         setTimeout(() => {
             this.next()
         }, 1000)
@@ -349,9 +365,13 @@ GameScene.prototype.next = function () {
                 })
             } else {
                 $(this.game.box).css(this.game.LR)
+                this.skipBtn.$ele.css({
+                    left: '852px',
+                    bottom: '-40px'
+                })
             }
             // 添加下一个“不同”的图片到页面上
-            this.$ele = $('<img>').attr('src', this.data.src).prependTo(this.game.box)
+            this.$ele = $('<img>').attr('src', this.data.imgPath).prependTo(this.game.box)
         })
 
         this.reset()

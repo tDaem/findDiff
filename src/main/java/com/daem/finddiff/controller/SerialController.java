@@ -7,6 +7,8 @@ import com.daem.finddiff.service.SerialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Description 序列号控制器
  * @Author tyx
@@ -21,6 +23,16 @@ public class SerialController {
     @GetMapping("/serial")
     public ResponseResult<Serial> getSerialBySerial(String serialNum){
         return serialService.getSerialBySerial(serialNum);
+    }
+
+    @GetMapping("/serial/{id}")
+    public ResponseResult<Serial> getSerial(@PathVariable Integer id){
+        return serialService.getSerial(id);
+    }
+
+    @GetMapping("/serials")
+    public ResponseResult<List<Serial>> getSerials(){
+        return serialService.getSerials();
     }
 
     /**
@@ -39,9 +51,14 @@ public class SerialController {
      * @param id 序列号id
      * @return 如果删除成功，泛型中返回true，否则false
      */
-    @DeleteMapping(value = "/serial")
-    public ResponseResult<Boolean> delSerial(Integer id) {
+    @DeleteMapping(value = "/serial/{id}")
+    public ResponseResult<Boolean> delSerial(@PathVariable Integer id) {
         return serialService.delSerial(id);
+    }
+
+    @DeleteMapping(value = "/serials")
+    public ResponseResult<Boolean> delSerials(@RequestBody Integer[] ids) {
+        return serialService.delSerials(ids);
     }
 
     /**

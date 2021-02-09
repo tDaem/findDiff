@@ -15,12 +15,7 @@ StartScene.prototype.constructor = StartScene
 // 实现点击事件监听函数
 // 当点击开始按扭时移除全屏按扭并加载游戏场景
 StartScene.prototype.clickListener = function (x, y) {
-    //分单人游戏和多人游戏情况
-    // if (x > 643 && x < 858 && y > 334 && y < 418) {
-    //     //请求网络加载游戏数据
-    //     this.fullScreen.remove()
-    //     this.game.loadGameScene(this)
-    // }
+
 }
 
 // 重写场景加载方法，添加全屏按扭
@@ -248,8 +243,10 @@ StartScene.prototype.connect = function (showStartBtn) {
     loading.showModal()
     //建立长连接
     if ('WebSocket' in window) {
-        if (!Scene.webSocket)
-            Scene.webSocket = new WebSocket("ws://localhost:8090/game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
+        if (!Scene.webSocket){
+            var Ip = window.location.host;
+            Scene.webSocket = new WebSocket("ws:/" + Ip + "//game/" + this.params.roomNum + "?gameName=" + this.params.gameId + "&serialNum=" + this.params.serial.serialNum + "&mutilPlay=true");
+        }
     } else {
         loading.close().remove()
         alert('当前浏览器不支持WebSocket！')

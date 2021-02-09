@@ -2,7 +2,11 @@ package com.daem.finddiff.dao;
 
 import com.daem.finddiff.entity.Serial;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @Description
@@ -19,4 +23,13 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
      */
     Serial findBySerialNum(String serial) throws Exception;
 
+    @Modifying
+    @Query("update Serial set game.id = null where game.id in :ids")
+    void updateByIds(Integer[] ids);
+
+    @Modifying
+    @Query("delete from Serial where id in :ids")
+    void delAllSerialsByIds(Integer[] ids);
+
+    List<Serial> findAllByGame_Id(Integer gameId);
 }

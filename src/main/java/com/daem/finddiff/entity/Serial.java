@@ -2,6 +2,7 @@ package com.daem.finddiff.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -48,7 +49,7 @@ public class Serial {
     /**
      * 多个序列号玩同一个游戏
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Game game;
 
     /**

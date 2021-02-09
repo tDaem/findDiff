@@ -6,8 +6,11 @@ import com.daem.finddiff.entity.Serial;
 import com.daem.finddiff.dao.SerialDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @Description 对游戏序列号进行crud服务
@@ -57,6 +60,34 @@ public class SerialService {
         try {
             Serial serial1 = serialDao.save(serial);
             return ResponseResult.defSuccessful(serial1);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    public ResponseResult<List<Serial>> getSerials() {
+        try {
+            List<Serial> all = serialDao.findAll();
+            return ResponseResult.defSuccessful(all);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    public ResponseResult<Serial> getSerial(Integer id) {
+        try {
+            Optional<Serial> optionalSerial = serialDao.findById(id);
+            return optionalSerial.map(ResponseResult::defSuccessful).orElseGet(ResponseResult::defSuccessful);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public ResponseResult<Boolean> delSerials(Integer[] ids) {
+        try {
+            serialDao.delAllSerialsByIds(ids);
+            return ResponseResult.defSuccessful();
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }

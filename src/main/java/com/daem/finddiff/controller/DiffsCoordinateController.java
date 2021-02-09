@@ -2,10 +2,8 @@ package com.daem.finddiff.controller;
 
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
-import com.daem.finddiff.entity.GameSceneData;
 import com.daem.finddiff.service.DiffsCoordinateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;

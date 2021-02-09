@@ -1,8 +1,6 @@
 package com.daem.finddiff.service;
 
-import com.daem.finddiff.dao.DiffsCoordinateDao;
-import com.daem.finddiff.dao.GameSceneDataDao;
-import com.daem.finddiff.dao.RecordDao;
+import com.daem.finddiff.dao.*;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -28,10 +28,15 @@ public class GameSceneDataService {
     private GameSceneDataDao gameSceneDataDao;
 
     @Autowired
+    private GameDao gameDao;
+
+    @Autowired
     private DiffsCoordinateDao diffsCoordinateDao;
 
     @Autowired
     private RecordDao recordDao;
+
+    private SerialDao serialDao;
 
     @Value("${file.path}")
     private String imgPath;
@@ -82,6 +87,17 @@ public class GameSceneDataService {
     public ResponseResult<GameSceneData> delGameSceneData(Integer id) {
         try {
             recordDao.deleteAllByGameSceneDataId(id);
+            List<Game> games = gameDao.findAll().stream().filter(game -> {
+                List<GameSceneData> gameSceneDatas = game.getGameSceneDatas();
+                for (GameSceneData gameSceneData : gameSceneDatas) {
+                    return gameSceneData.getId().equals(id);
+                }
+                return false;
+            }).collect(Collectors.toList());
+            for (Game g : games) {
+                g.setGameSceneDatas(null);
+                gameDao.save(g);
+            }
             gameSceneDataDao.deleteById(id);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {

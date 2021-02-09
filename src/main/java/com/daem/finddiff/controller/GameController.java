@@ -6,6 +6,8 @@ import com.daem.finddiff.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Description 配置相关的游戏数据控制器
  * @Author tyx
@@ -39,6 +41,11 @@ public class GameController {
         return gameService.getGame(id);
     }
 
+    @GetMapping(value = "/games")
+    public ResponseResult<List<Game>> getGames() {
+        return gameService.getGames();
+    }
+
     /**
      * 删除游戏实例
      *
@@ -48,6 +55,12 @@ public class GameController {
     @DeleteMapping(value = "/game/{id}")
     public ResponseResult<Boolean> delGame(@PathVariable Integer id) {
         return gameService.delGame(id);
+    }
+
+
+    @DeleteMapping(value = "/games")
+    public ResponseResult<Boolean> delGames(@RequestBody Integer[] ids) {
+        return gameService.delGames(ids);
     }
 
     /**

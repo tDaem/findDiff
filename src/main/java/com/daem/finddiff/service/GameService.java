@@ -1,13 +1,18 @@
 package com.daem.finddiff.service;
 
 import com.daem.finddiff.dao.GameDao;
+import com.daem.finddiff.dao.SerialDao;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Game;
+import com.daem.finddiff.entity.Serial;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @Description
@@ -19,6 +24,9 @@ public class GameService {
 
     @Autowired
     private GameDao gameDao;
+
+    @Autowired
+    private SerialDao serialDao;
 
 
     public ResponseResult<Game> saveGame(Game game) {
@@ -56,6 +64,10 @@ public class GameService {
      */
     public ResponseResult<Boolean> delGame(Integer id) {
         try {
+            serialDao.findAllByGame_Id(id).stream().forEach(serial -> {
+                serial.setGame(null);
+                serialDao.save(serial);
+            });
             gameDao.deleteById(id);
             return ResponseResult.defSuccessful(true);
         } catch (Exception e) {
@@ -73,6 +85,26 @@ public class GameService {
         try {
             Game game1 = gameDao.save(game);
             return ResponseResult.defSuccessful(game1);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    public ResponseResult<List<Game>> getGames() {
+        try {
+            List<Game> all = gameDao.findAll();
+            return ResponseResult.defSuccessful(all);
+        } catch (Exception e) {
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public ResponseResult<Boolean> delGames(Integer[] ids) {
+        try {
+            serialDao.updateByIds(ids);
+            gameDao.delAllByIds(ids);
+            return ResponseResult.defSuccessful();
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }

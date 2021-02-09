@@ -116,7 +116,6 @@ Game.prototype.loadStartScene = function (prevScene, params) {//
 //加载下一张图片
 Game.prototype.loadGameScene = function (prevScene, params) {
     console.log(params)
-    params.game.gameSceneDatas = Game.GameSceneDatas
     if (params.game && params.game.gameSceneDatas.length === 0) {
         dialog({
             title: "温馨提示",
@@ -130,35 +129,6 @@ Game.prototype.loadGameScene = function (prevScene, params) {
     }
     var scene = new GameScene(this, params.game.gameSceneDatas)//游戏进行中的 传入场景数据
     scene.load(prevScene, params)
-    /*var loading = dialog()
-    loading.showModal()
-    $.ajax({
-        url: "/room",
-        type: 'get',
-        timeout: 12000,
-        dataType: 'json',
-        success: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.code === 0 && ret.data) {
-                console.log('load next scene...')
-                params.roomNum = ret.data//保存房间号
-                var scene = new GameScene(this, params.game.gameSceneDatas)//游戏进行中的 传入场景数据
-                scene.load(prevScene, params)
-            } else {
-                floatDialog('进入游戏失败！')
-            }
-        },
-        error: ret => {
-            loading.close().remove()
-            console.log(ret)
-            if (ret.status == 'timeout') {
-                floatDialog('请求超时，请检查网络！')
-            } else {
-                floatDialog('服务器异常！')
-            }
-        }
-    })*/
 }
 
 // 加载游戏完成的场景
