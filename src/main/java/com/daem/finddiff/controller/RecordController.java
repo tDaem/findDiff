@@ -35,7 +35,7 @@ public class RecordController {
     }
 
     @GetMapping(value = "/records")
-    public ResponseResult<Map<Integer,Map<Integer,List<Record>>>> getRecordsByGameId(Integer gameId){
+    public ResponseResult<Map<String, Object>> getRecordsByGameId(Integer gameId){
         return recordService.getRecordsByGameId(gameId);
     }
 }

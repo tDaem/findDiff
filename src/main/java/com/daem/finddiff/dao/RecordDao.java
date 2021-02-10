@@ -24,5 +24,6 @@ public interface RecordDao extends JpaRepository<Record, Integer> {
     @Query("DELETE FROM Record r WHERE r.gameSceneData.id IN :ids")
     void delByIds(Integer[] ids);
 
-    List<Record> findAllBySerial_Game_Id(Integer gameId);
+    @Query("select r from Record r where r.serial.game.id = :gameId order by r.diffIndex,r.time")
+    List<Record> findAllByGameId(Integer gameId);
 }

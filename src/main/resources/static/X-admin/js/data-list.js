@@ -57,41 +57,26 @@ layui.use(['laydate', 'form', 'jquery', 'table'],
                     success: (ret) => {
                         console.log(ret)
                         if (ret.code > 0)
-                            return layer.msg('获取失败失败')
-
-                        for(var p in ret.data){
-                            cols.push()
+                            return layer.msg('获取数据失败')
+                        var cols = []
+                        var thead = ret.data.tHead
+                        console.log(thead)
+                        for (var item in thead) {
+                            var field = item;  //key1,key2,key3...
+                            var fieldObj = {
+                                field: field,
+                                title: thead[item]
+                            }
+                            cols.push(fieldObj);
                         }
 
                         table.render({
                             elem: '#records',
-                            page: true //开启分页
-                            , toolbar: '#tabletoolbar'
-                            , defaultToolbar: []
-                            , cols: [[ //表头
-                                {title: '序号', type: 'numbers', rowspan: 2}
-                                , {field: 'date', title: '时间', align: 'center', sort: 'true', rowspan: 2, width: 150}
-                                , {title: '产出品种', align: 'center', colspan: cols.length}
-                                , {field: 'total', title: '合计', align: 'center', sort: 'true', rowspan: 2, width: 100}]
-                                , cols]
-                            , done: function (res, curr, count) {
-                                var tablemaindom = $("table[id=tablelist]").next().find(".layui-table-body.layui-table-main");
-                                $.each(res.data, function (index, value) {
-                                    var total = 0;
-                                    //开始组装数据 这里是给单元格赋值
-                                    $.each(value.listinfo, function (indexinfo, valueinfo) {
-                                        tablemaindom.find("tr[data-index=" + value.LAY_TABLE_INDEX + "]").find(
-                                            "td[data-field=" + valueinfo.productid + "]").find(
-                                            "div").text(valueinfo.outputplanvalue);
-                                        total += valueinfo.outputplanvalue;
-                                    });
-                                    //合计
-                                    tablemaindom.find("tr[data-index=" + value.LAY_TABLE_INDEX + "]").find(
-                                        "td[data-field=total]").find(
-                                        "div").text(total);
-                                });
-
-                            }
+                            page: false,
+                            toolbar: '#toolbarDemo',
+                            defaultToolbar: ['exports'],
+                            cols: [cols],
+                            data: ret.data.tBody
                         });
                     },
                     complete: () => {

@@ -32,4 +32,5 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
     void delAllSerialsByIds(Integer[] ids);
 
     List<Serial> findAllByGame_Id(Integer gameId);
+
 }
