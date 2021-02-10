@@ -29,10 +29,9 @@ public class SerialService {
         Serial serialEntity = null;
         try {
             serialEntity = serialDao.findBySerialNum(serial);
-            //todo
-            /*if (serialEntity.getSerialStatus() != SerialStatus.NOT_STARTED){//游戏序号已被使用
+            if (serialEntity.getSerialStatus() != SerialStatus.NOT_STARTED){//游戏序号已被使用
                 return ResponseResult.defSuccessful(serialEntity);
-            }*/
+            }
             serialEntity.setUserName(userName);
             Serial save = serialDao.save(serialEntity);
             return ResponseResult.defSuccessful(save);
@@ -109,6 +108,18 @@ public class SerialService {
             serialDao.save(one);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public ResponseResult<Boolean> updateSerialsWithGameId(Integer[] ids, Integer gameId) {
+        try {
+            serialDao.updateSerialsWithGameId(ids, gameId);
+            return ResponseResult.defSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
     }

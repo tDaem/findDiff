@@ -33,4 +33,7 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
 
     List<Serial> findAllByGame_Id(Integer gameId);
 
+    @Modifying
+    @Query("update Serial s set s.game.id = :gameId where s.id in :ids")
+    void updateSerialsWithGameId(Integer[] ids, Integer gameId);
 }

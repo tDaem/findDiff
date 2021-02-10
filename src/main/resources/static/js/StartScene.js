@@ -147,7 +147,7 @@ StartScene.prototype.processCreateRoom = function (preDialog) {
     })
     loading.showModal()
     $.ajax({
-        url: "/room",
+        url: "/room?gameId" + this.params.serialNum.game.id,
         type: 'get',
         timeout: 12000,
         dataType: 'json',
@@ -236,7 +236,7 @@ function changeSerialStatus(serial, status) {
         type: 'put',
         dataType: 'json',
         success: (res) => {
-            if (res.code > 0){
+            if (res.code > 0) {
                 floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
             }
         },

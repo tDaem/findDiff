@@ -20,8 +20,8 @@ public class RoomController {
 
     //创建房间并返回房间号
     @GetMapping("/room")
-    public ResponseResult<Integer> getRoomNum(){
-        return roomService.createRoom();
+    public ResponseResult<Integer> getRoomNum(Integer gameId){
+        return roomService.createRoom(gameId);
     }
 
     //创建房间并返回房间号

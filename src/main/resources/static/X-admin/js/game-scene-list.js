@@ -125,7 +125,7 @@ function previewImg(imgPath) {
     img.src = imgPath;
     var height = img.height + 50; //获取图片高度
     var width = img.width; //获取图片宽度
-    var imgHtml = "<img src='" + imgPath + "' />";
+    var imgHtml = "<img style='width: 100%;height: 100%;' src='" + imgPath + "' />";
     //弹出层
     layer.open({
         type: 1,

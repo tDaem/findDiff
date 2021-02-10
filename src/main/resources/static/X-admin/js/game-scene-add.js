@@ -15,6 +15,40 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                 //预读本地文件示例，不支持ie8
                 obj.preview(function (index, file, result) {
                     $('#img').attr('src', result); //图片链接（base64）
+                    $('#img').on('click', function previewImg() {
+                        var img = new Image();
+                        img.src = result;
+                        var width, height
+                        img.onload = () => {
+                            if (img.width > img.height) {
+                                width = '900px'
+                                height = '565px'
+                            } else {
+                                width = '565px'
+                                height = '900px'
+                            }
+                            var imgHtml = "<img id='testImg' style='width: " + width + ";height: " + height + ";' src='" + result + "' />";
+                            //弹出层
+                            layer.open({
+                                type: 1,
+                                shade: 0.8,
+                                offset: 'auto',
+                                area: [width + 'px', height + 'px'],
+                                shadeClose: true,//点击外围关闭弹窗
+                                scrollbar: false,//不现实滚动条
+                                title: "图片预览", //不显示标题
+                                content: imgHtml, //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                                cancel: function () {
+                                    //layer.msg('捕获就是从页面已经存在的元素上，包裹layer的结构', { time: 5000, icon: 6 });
+                                }
+                            });
+                            $('#testImg').click(function (ev) {
+                                var x = ev.offsetX
+                                var y = ev.offsetY
+                                layer.msg("X=" + x + "\nY=" + y);
+                            })
+                        }
+                    })
                 });
             },
             done: function (res) {
@@ -90,6 +124,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
             });
 
     });
+
 
 /**
  * 生成游戏关卡提交到后台的json数据

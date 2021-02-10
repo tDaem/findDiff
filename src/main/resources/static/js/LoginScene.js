@@ -70,11 +70,10 @@ LoginScene.prototype.loginBtnClick = function () {
                 //序列号校验
                 //存在该序列号时进入相应的游戏
                 console.log(ret.data)
-                //todo
-                // if (ret.data.serialStatus !== 'NOT_STARTED'){
-                //     floatDialog('该游戏序号已被使用')
-                //     return
-                // }
+                if (ret.data.serialStatus !== 'NOT_STARTED'){
+                    floatDialog('该游戏序号已被使用')
+                    return
+                }
                 this.game.loadStartScene(this,{
                     gameId: gameId,
                     serial: ret.data

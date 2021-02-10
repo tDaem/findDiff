@@ -73,6 +73,78 @@ function serial_del(obj, id) {
     });
 }
 
+function bindGames() {
+    var ids = [];
+
+    // 获取选中的id
+    $('tbody input').each(function (index, el) {
+        if ($(this).prop('checked')) {
+            ids.push($(this).val())
+        }
+    });
+    console.log('ids:' + ids)
+    if (ids.length === 0)
+        return layer.msg("请至少选择一个序号！",{icon: 5})
+    console.log(ids)
+    var selectHtml
+    $.ajax({
+        url: '/games',
+        type: 'get',
+        dataType: 'json',
+        contentType: 'application/json',
+        success: (ret) => {
+            console.log(ret)
+            if (ret.code > 0)
+                return layer.msg('获取游戏列表失败', {icon: 0})
+            if (ret.data.length === 0)
+                layer.msg("还没有游戏，请先新增游戏", {icon: 0})
+
+            selectHtml = '<div>' +
+                '   <div class="layui-inline">' +
+                '       <div class="layui-input-inline">' +
+                '           <select name="games" lay-verify="required">'
+            $.each(ret.data, function (inx, item) {
+                selectHtml +=
+                    '<option value="' + item.id + '">' + item.gameName + '</option>'
+            })
+            selectHtml +=
+                '</select>' +
+                '       </div>'
+
+            layer.open({
+                title: '选择绑定的游戏',
+                closeBtn: 0,
+                shadeClose: true,
+                content: selectHtml,
+                yes: function(index, layero){
+                    var gameId = $('select option:selected').val()
+                    console.log(gameId)
+                    $.ajax({
+                        url: '/serials',
+                        type: 'put',
+                        data: {
+                            serialIds: ids,
+                            gameId: gameId
+                        },
+                        dataType: 'json',
+                        success: (res) => {
+                            if (res.code > 0)
+                                return layer.msg('绑定失败！')
+                            layer.close(index)
+                            return layer.msg('绑定成功！')
+                        }
+                    })
+                },
+                end: () => {
+                    location.reload()
+                }
+            });
+        },
+        complete: () => {
+        }
+    })
+}
+
 
 function delAll(argument) {
     var ids = [];

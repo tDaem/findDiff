@@ -73,6 +73,11 @@ public class SerialController {
         return serialService.updateSerial(serial);
     }
 
+    @PutMapping(value = "/serials", produces = "application/json;charset=UTF-8")
+    public ResponseResult<Boolean> updateSerialsWithGameId(@RequestParam("serialIds[]") Integer[] ids, Integer gameId) {
+        return serialService.updateSerialsWithGameId(ids,gameId);
+    }
+
     @PutMapping(value = "/updateStatus")
     public ResponseResult<Serial> updateSerialStatus(Integer serialId, SerialStatus serialStatus) {
         return serialService.updateSerialBySerialId(serialId, serialStatus);

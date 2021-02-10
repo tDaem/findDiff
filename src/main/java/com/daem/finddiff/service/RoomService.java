@@ -28,7 +28,7 @@ public class RoomService {
      *
      * @return
      */
-    public ResponseResult<Integer> createRoom() {
+    public ResponseResult<Integer> createRoom(Integer gameId) {
         int roomNum;
         do {
             roomNum = new Random().nextInt(899999) + 100000;

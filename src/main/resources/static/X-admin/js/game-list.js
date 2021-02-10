@@ -84,7 +84,6 @@ function game_del(obj, id) {
     });
 }
 
-
 function delAll(argument) {
     var ids = [];
 
