@@ -147,7 +147,7 @@ StartScene.prototype.processCreateRoom = function (preDialog) {
     })
     loading.showModal()
     $.ajax({
-        url: "/room?gameId" + this.params.serialNum.game.id,
+        url: "/room?gameId" + this.params.serial.game.id,
         type: 'get',
         timeout: 12000,
         dataType: 'json',
@@ -305,6 +305,7 @@ StartScene.prototype.connect = function (showStartBtn) {
             } else if (msg.data.messageType === 'DATA') {
                 //处理数据
                 if (msg.data.data === 'startGame') {//开始游戏
+                    changeSerialStatus(this.params.serial, 'IN_PROGRESS')
                     this.roomDialog.close().remove()
                     this.game.loadGameScene(this, this.params)
                 } else {//更新房间信息

@@ -40,6 +40,7 @@ public class Game {
      * 一个游戏有多个找不同的关卡组成
      */
     @ManyToMany
+    @OrderBy("id")
     private List<GameSceneData> gameSceneDatas;
 
     /**

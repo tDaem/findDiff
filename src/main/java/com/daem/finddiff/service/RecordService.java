@@ -67,14 +67,17 @@ public class RecordService {
             List<Map<String, String>> tBodyDtos = new LinkedList<>();
             //序号（玩家id）
             List<String> players = new ArrayList<>();
-            for (int i = 0; i < records.size(); i++) {
-                Record record = records.get(i);
-                if (!players.contains(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")")) {
-                    players.add(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
-                }
-            }
+
             for (Integer roomNum : roomMap.keySet()) {//遍历房间
+                for (int i = 0; i < records.size(); i++) {//该房间中的玩家
+                    Record record = records.get(i);
+                    if (!players.contains(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")")) {
+                        players.add(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
+                    }
+                }
+
                 for (Integer gameSceneDataId : roomMap.get(roomNum).keySet()) {//遍历关卡
+                    List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);
                     Map<String, String> tBodyMap = new LinkedHashMap<>();
                     tBodyMap.put("roomNum", roomNum.toString());
                     GameSceneData gameSceneData = gameSceneDataDao.getOne(gameSceneDataId);
@@ -88,41 +91,38 @@ public class RecordService {
                     }
                     tBodyMap.put("serialNum", playersStr.toString());
                     tBodyMap.put("totalDiffNum", String.valueOf(gameSceneData.getDiffsCoordinates().size()));
-                    tBodyMap.put("hitDiffNum", String.valueOf(records.get(records.size() - 1).getDiffIndex()));
+                    tBodyMap.put("hitDiffNum", String.valueOf(recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex()));
                     //循环生成第几次点中和点中玩家
                     int lastHitIndex = 0;
                     for (int i = 1; i < maxDiff + 1; i++) {
-                        for (int j = 0; j < records.size(); j++) {
-                            Record record = records.get(j);
+                        for (int j = 0; j < recordsGroupByGameScene.size(); j++) {
+                            Record record = recordsGroupByGameScene.get(j);
                             if (record.getDiffIndex() == i) {
-                                tBodyMap.put("hitNo" + i + "Diff", String.valueOf((record.getTime() - records.get(lastHitIndex).getTime()) / 1000));
+                                tBodyMap.put("hitNo" + i + "Diff", String.valueOf((record.getTime() - recordsGroupByGameScene.get(lastHitIndex).getTime()) / 1000));
                                 tBodyMap.put("hitNo" + i + "DiffPlayer", record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
                                 lastHitIndex = j;
                                 break;
                             }
                         }
                     }
-                    if (gameSceneData.getDiffsCoordinates().size() > records.get(records.size() - 1).getDiffIndex()) {
-                        for (int i = records.get(records.size() - 1).getDiffIndex() + 1; i <= gameSceneData.getDiffsCoordinates().size(); i++) {
+                    if (gameSceneData.getDiffsCoordinates().size() > recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex()) {
+                        for (int i = recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex() + 1; i <= gameSceneData.getDiffsCoordinates().size(); i++) {
                             tBodyMap.put("hitNo" + i + "Diff", "");
                             tBodyMap.put("hitNo" + i + "DiffPlayer", "");
                         }
                     }
-
-                    for (int i = 0; i < roomMap.get(roomNum).size(); i++) {
-                        List<Record> records1 = roomMap.get(roomNum).get(gameSceneDataId);
-                        for (Record record : records1) {
-                            if (record.isSkip()) {
-                                tBodyMap.put("isSkip", "跳过");
-                                break;
-                            }
+                    for (Record record : recordsGroupByGameScene) {//当前关卡是否跳过
+                        if (record.isSkip()) {
+                            tBodyMap.put("isSkip", "跳过");
+                            break;
                         }
                     }
-                    if (records.get(records.size() - 1).getDiffIndex() < gameSceneData.getDiffsCoordinates().size()) {
-                        long num = records.stream().filter(record -> record.getDiffIndex() == records.get(records.size() - 1).getDiffIndex()).count() - 2;
+
+                    if (recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex() < gameSceneData.getDiffsCoordinates().size()) {
+                        long num = recordsGroupByGameScene.stream().filter(record -> record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex()).count() - 2;
                         tBodyMap.put("lastToSkipHitNum", String.valueOf(num));
                     }
-                    tBodyMap.put("finishTime", String.valueOf((records.get(records.size() - 1).getTime() - records.get(0).getTime()) / 1000));
+                    tBodyMap.put("finishTime", String.valueOf((recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getTime() - recordsGroupByGameScene.get(0).getTime()) / 1000));
                     tBodyDtos.add(tBodyMap);
                 }
             }

@@ -126,6 +126,8 @@ public class GameWebsocketController {
             if ("startGame".equals(message)) {//开始游戏
                 sendStrMsg(roomNum, Message.DATA(message));
             } else if ("next".equals(message)) {
+                //下一关时清空当前关卡的数据
+                RoomService.getRoomDatas(roomNum).clear();
                 sendStrMsg(roomNum, Message.DATA(message));
             } else {//广播坐标
                 DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
@@ -157,7 +159,7 @@ public class GameWebsocketController {
     private static <T> void broadcast(int roomNum, Session self, boolean onOpen, ResponseResult<Message<T>> message) {
 
         for (Session session : RoomService.getRooms().get(roomNum)) {
-            if (!onOpen && session.equals(self)) continue;
+            if (!onOpen) continue;
             try {
                 session.getBasicRemote().sendObject(message);
             } catch (IOException | EncodeException e) {
