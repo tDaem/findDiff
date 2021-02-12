@@ -20,8 +20,8 @@ public class RoomService {
      * 用来存储已创建的房间
      */
     private static final Map<Integer, List<Session>> rooms = new HashMap<>();
-    //房间中的坐标数据
-    private static final Map<Integer, List<DiffsCoordinate>> roomDatas = new ConcurrentHashMap();
+    //房间中点击的坐标
+    private static final Map<Integer, DiffsCoordinate> diffsCoordinateMap = new HashMap<>();
 
     /**
      * 创建房间号
@@ -34,7 +34,7 @@ public class RoomService {
             roomNum = new Random().nextInt(899999) + 100000;
         } while (rooms.containsKey(roomNum));
         rooms.put(roomNum, new ArrayList<>());
-        roomDatas.put(roomNum, new ArrayList<>());
+        diffsCoordinateMap.put(roomNum, null);
         return ResponseResult.defSuccessful(roomNum);
     }
 
@@ -44,7 +44,7 @@ public class RoomService {
      */
     public static void destroyRoom(int roomNum) {
         //销毁房间中的数据
-        roomDatas.remove(roomNum);
+        diffsCoordinateMap.remove(roomNum);
         //销毁房间
         rooms.remove(roomNum);
     }
@@ -58,12 +58,16 @@ public class RoomService {
     }
 
     /**
-     * 记录房间中不同点的做标数据
+     * 获取点击的坐标
      * @param roomNum
      * @return
      */
-    public static List<DiffsCoordinate> getRoomDatas(int roomNum) {
-        return roomDatas.get(roomNum);
+    public static DiffsCoordinate getDiffsCoordinate(int roomNum) {
+        return diffsCoordinateMap.get(roomNum);
+    }
+
+    public static void putDiffsCoordinate(int roomNum, DiffsCoordinate diffsCoordinate) {
+        diffsCoordinateMap.put(roomNum, diffsCoordinate);
     }
 
     /**

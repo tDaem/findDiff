@@ -55,7 +55,7 @@ public class RecordService {
             tHeads.put("totalDiffNum", "总共的不同数");
             tHeads.put("hitDiffNum", "点中的不同数");
             for (int i = 1; i < maxDiff + 1; i++) {
-                tHeads.put("hitNo" + i + "Diff", "点中第" + i + "处不同");
+                tHeads.put("hitNo" + i + "Diff", "点中第" + i + "处不同所花事件（s）");
                 tHeads.put("hitNo" + i + "DiffPlayer", "点中第" + i + "处不同玩家");
             }
             tHeads.put("isSkip", "是否跳过的关卡");

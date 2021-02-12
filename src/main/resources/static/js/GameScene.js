@@ -175,34 +175,23 @@ GameScene.prototype.connect = function () {
 }
 
 /**
- * 处理坐标数据
+ * 处理坐标数据 （主要负责花圈）
  */
-GameScene.prototype.processData = function (data) {
-    console.log(data)
-    data.forEach((v, i) => {
-        this.differences.check(v.x, v.y)
-        this.diffIndex++
-        if (this.data.diffsCoordinates.length === this.diffIndex)
-            setTimeout(() => {
-                this.next()
-            }, 1000)
-    })
-}
-
-// 重写点击监听函数
-GameScene.prototype.clickListener = function (x, y) {
-    console.log('game scene click!')
+GameScene.prototype.processData = function (diff) {
+    console.log(diff)
     let boxWidth = $(this.game.box).width();
     let boxHeight = $(this.game.box).height();
     if (this.data.structure === 'LEFT_AND_RIGHT') {//左右结构的图片
-        if (x < boxWidth / 2) {
-            x = x + boxWidth / 2
+        if (diff.x < boxWidth / 2) {
+            diff.x = diff.x + boxWidth / 2
         }
     } else {//上下结构的图片
-        if (y < boxHeight / 2) {
-            y = y + boxHeight / 2
+        if (diff.y < boxHeight / 2) {
+            diff.y = diff.y + boxHeight / 2
         }
     }
+
+    //需要记录的数据
     var record = {
         roomNum: this.params.roomNum,
         start: false,//是否开始游戏时
@@ -217,48 +206,49 @@ GameScene.prototype.clickListener = function (x, y) {
         time: new Date().getTime(),//当前操作的时间
         hit: false//是否命中不同点
     }
-    /**
-     * 将正确的数据发送到后台
-     */
-    if (this.differences.check(x, y)) {
+    if (this.differences.check(diff.x, diff.y)) {
         record.start = false
         record.diffIndex = ++this.diffIndex
         record.hit = true
         //蓝底变色
-        // this.label.decrease()
-        Scene.webSocket.send(JSON.stringify({
-            x: x,
-            y: y
-        }))
-
     } else {
         var flag = boxWidth > boxHeight
-        var errorLeft = x - radius
-        var errorTop = y - radius
+        var errorLeft = diff.x - radius
+        var errorTop = diff.y - radius
         var errorLeft_1
         var errorTop_1
         if (flag) {
-            errorLeft_1 = x - radius - boxWidth / 2
-            errorTop_1 = y - radius
+            errorLeft_1 = diff.x - radius - boxWidth / 2
+            errorTop_1 = diff.y - radius
         } else {
-            errorLeft_1 = x - radius
-            errorTop_1 = y - radius - boxHeight / 2
+            errorLeft_1 = diff.x - radius
+            errorTop_1 = diff.y - radius - boxHeight / 2
         }
 
         this.differences.show(null, errorLeft, errorTop)
         //对称部分也同时画圈
         this.differences.show(null, errorLeft_1, errorTop_1)
 
+        //需要记录的数据
         record.start = false
-        record.diffIndex = this.diffIndex
         record.hit = false
     }
     this.records.push(record)
     console.log(this.records)
+
     if (this.data.diffsCoordinates.length === this.diffIndex)
         setTimeout(() => {
             this.next()
         }, 1000)
+}
+
+// 重写点击监听函数（记录数据）
+GameScene.prototype.clickListener = function (x, y) {
+    console.log('game scene click!')
+    Scene.webSocket.send(JSON.stringify({
+        x: x,
+        y: y
+    }))
 }
 
 /**

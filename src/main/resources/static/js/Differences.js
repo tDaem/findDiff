@@ -9,7 +9,7 @@ function Differences(game, data) {
 }
 
 // 判断x,y坐标点是否在“不同”数据中
-Differences.prototype.check = function (x, y) {
+Differences.prototype.check = function (x, y, noDraw) {
     // 循环每一个“不同”数据
     for (var i = 0; i < this.diffs.length; i++) {
         var diff = this.diffs[i]
@@ -26,21 +26,23 @@ Differences.prototype.check = function (x, y) {
         var bottom = diff.y + radius
 
         if (x > left && x < right && y > top && y < bottom) {
-            // 如果坐标点中“不同”，使用相关数据画圈
-            var flag = $(this.game.box).width() > $(this.game.box).height()
-            var left_1
-            var top_1
-            if (flag){
-                left_1 = diff.x - radius - $(this.game.box).width() / 2
-                top_1 = diff.y - radius
-            }else {
-                left_1 = diff.x - radius
-                top_1 = diff.y - radius - $(this.game.box).height() / 2
-            }
+            if (!noDraw){
+                // 如果坐标点中“不同”，使用相关数据画圈
+                var flag = $(this.game.box).width() > $(this.game.box).height()
+                var left_1
+                var top_1
+                if (flag){
+                    left_1 = diff.x - radius - $(this.game.box).width() / 2
+                    top_1 = diff.y - radius
+                }else {
+                    left_1 = diff.x - radius
+                    top_1 = diff.y - radius - $(this.game.box).height() / 2
+                }
 
-            this.show(diff, left, top)
-            //左边也同时画圈
-            this.show(diff, left_1, top_1)
+                this.show(diff, left, top)
+                //左边也同时画圈
+                this.show(diff, left_1, top_1)
+            }
             return true
         }
     }
