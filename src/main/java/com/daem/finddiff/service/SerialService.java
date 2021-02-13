@@ -1,5 +1,6 @@
 package com.daem.finddiff.service;
 
+import com.daem.finddiff.dao.RecordDao;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Game;
 import com.daem.finddiff.entity.Serial;
@@ -23,6 +24,9 @@ public class SerialService {
 
     @Autowired
     private SerialDao serialDao;
+
+    @Autowired
+    private RecordDao recordDao;
 
     @Transactional
     public ResponseResult<Serial> getSerialBySerial(String serial, String userName) {
@@ -54,8 +58,10 @@ public class SerialService {
         }
     }
 
+    @Transactional
     public ResponseResult<Boolean> delSerial(Integer id) {
         try {
+            serialDao.updateSetGameIdNullByIds(new Integer[]{id});
             serialDao.deleteById(id);
             return ResponseResult.defSuccessful(true);
         } catch (Exception e) {
@@ -93,9 +99,11 @@ public class SerialService {
     @Transactional
     public ResponseResult<Boolean> delSerials(Integer[] ids) {
         try {
+            serialDao.updateSetGameIdNullByIds(ids);//断开与游戏的关联
             serialDao.delAllSerialsByIds(ids);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
     }
