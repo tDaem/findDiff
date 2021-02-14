@@ -88,29 +88,69 @@ layui.use(['laydate', 'form', 'jquery', 'table'],
 
     });
 
-/*用户-删除*/
-function member_del(obj, id) {
-    layer.confirm('确认要删除吗？',
+function record_del() {
+    layer.confirm('确认要清除吗？',
         function (index) {
             //发异步删除数据
-            $(obj).parents("tr").remove();
-            layer.msg('已删除!', {
-                icon: 1,
-                time: 1000
-            });
+            $.ajax({
+                url: '/record?gameId=' + $('select option:selected').val(),
+                type: 'delete',
+                dataType: 'json',
+                success: (res) => {
+                    if (res.code > 0){
+                        return layer.msg('清除失败！', {icon: 2});
+                    }
+                    layer.open({
+                        title: '提示',
+                        closeBtn: 0,
+                        shadeClose: false,
+                        content: '已清除',
+                        yes: function(index, layero){
+                            layer.close(index)
+                        },
+                        end: () => {
+                            location.reload()
+                        }
+                    });
+                },
+                error: (res) => {
+                    return layer.msg('清除失败！', {icon: 2});
+                }
+            })
+
         });
 }
 
-function delAll(argument) {
+function delAllRecord() {
 
-    var data = tableCheck.getData();
-
-    layer.confirm('确认要删除吗？' + data,
+    layer.confirm('确认要删除所有数据吗？',
         function (index) {
             //捉到所有被选中的，发异步进行删除
-            layer.msg('删除成功', {
-                icon: 1
-            });
-            $(".layui-form-checked").not('.header').parents('tr').remove();
+            $.ajax({
+                url: '/records',
+                type: 'delete',
+                dataType: 'json',
+                success: (res) => {
+                    if (res.code > 0){
+                        return layer.msg('清除失败！', {icon: 2});
+                    }
+                    layer.open({
+                        title: '提示',
+                        closeBtn: 0,
+                        shadeClose: false,
+                        content: '已清除',
+                        yes: function(index, layero){
+                            layer.close(index)
+                        },
+                        end: () => {
+                            location.reload()
+                        }
+                    });
+                },
+                error: (res) => {
+                    return layer.msg('清除失败！', {icon: 2});
+                }
+            })
+
         });
 }

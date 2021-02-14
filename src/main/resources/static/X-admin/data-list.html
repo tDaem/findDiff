@@ -35,30 +35,29 @@
                                 </div>
                             </div>
                             <div class="layui-inline">
-                                <div class="layui-input-inline layui-show-xs-block">
+                                <div class="layui-show-xs-block">
                                     <button class="layui-btn" lay-submit="" lay-filter="search">
                                         <i class="layui-icon">&#xe615;</i></button>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-show-xs-block">
+                                    <input type="button" value="清除选中游戏数据" onclick="record_del()" class="layui-btn layui-btn-danger"/>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-show-xs-block">
+                                    <input type="button" onclick="delAllRecord()" value="清除所有游戏数据" class="layui-btn layui-btn-danger"/>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="layui-card-body ">
-                    <table class="layui-table layui-form" id="records">
+                    <table class="layui-table layui-form" id="records" lay-filter="records">
 
                     </table>
                 </div>
-                <!--<div class="layui-card-body ">
-                    <div class="page">
-                        <div>
-                            <a class="prev" href="">&lt;&lt;</a>
-                            <a class="num" href="">1</a>
-                            <span class="current">2</span>
-                            <a class="num" href="">3</a>
-                            <a class="num" href="">489</a>
-                            <a class="next" href="">&gt;&gt;</a></div>
-                    </div>
-                </div>-->
             </div>
         </div>
     </div>

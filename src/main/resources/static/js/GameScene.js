@@ -178,6 +178,8 @@ GameScene.prototype.connect = function () {
  * 处理坐标数据 （主要负责花圈）
  */
 GameScene.prototype.processData = function (diff) {
+    if (!diff)
+        return
     console.log(diff)
     let boxWidth = $(this.game.box).width();
     let boxHeight = $(this.game.box).height();

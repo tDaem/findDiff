@@ -77,16 +77,11 @@ public class GameSceneDataService {
         }
     }
 
-    /**
-     * 根据游戏id删除数据
-     *
-     * @param id
-     * @return
-     */
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public ResponseResult<GameSceneData> delGameSceneData(Integer id) {
         try {
             recordDao.deleteAllByGameSceneDataId(id);
+            //找出绑定了游戏的关卡
             List<Game> games = gameDao.findAll().stream().filter(game -> {
                 List<GameSceneData> gameSceneDatas = game.getGameSceneDatas();
                 for (GameSceneData gameSceneData : gameSceneDatas) {

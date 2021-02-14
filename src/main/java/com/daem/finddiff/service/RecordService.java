@@ -8,6 +8,7 @@ import com.daem.finddiff.entity.GameSceneData;
 import com.daem.finddiff.entity.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,5 +134,28 @@ public class RecordService {
             e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
+    }
+
+    @Transactional
+    public ResponseResult<Integer> delRecordByGameId(Integer gameId) {
+        try {
+            recordDao.deleteAllBySerial_Game_Id(gameId);
+            return ResponseResult.defSuccessful();
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public ResponseResult<Integer> delAll() {
+        try {
+            recordDao.deleteAll();
+            return ResponseResult.defSuccessful();
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+
     }
 }

@@ -4,10 +4,7 @@ import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Record;
 import com.daem.finddiff.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,19 +20,24 @@ public class RecordController {
 
     @Autowired
     private RecordService recordService;
-    /**
-     * 创建一个游戏实例
-     *
-     * @param records 要保存的数据
-     * @return
-     */
+
     @PostMapping(value = "/record")
-    public ResponseResult<Integer> createGame(@RequestBody Record[] records) {
+    public ResponseResult<Integer> saveRecords(@RequestBody Record[] records) {
         return recordService.saveRecord(Arrays.asList(records));
     }
 
     @GetMapping(value = "/records")
     public ResponseResult<Map<String, Object>> getRecordsByGameId(Integer gameId){
         return recordService.getRecordsByGameId(gameId);
+    }
+
+    @DeleteMapping(value = "/record")
+    public ResponseResult<Integer> delRecordByGameId(@RequestParam Integer gameId) {
+        return recordService.delRecordByGameId(gameId);
+    }
+
+    @DeleteMapping(value = "/records")
+    public ResponseResult<Integer> delAll() {
+        return recordService.delAll();
     }
 }

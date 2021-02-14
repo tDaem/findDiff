@@ -61,6 +61,7 @@ public class SerialService {
     @Transactional
     public ResponseResult<Boolean> delSerial(Integer id) {
         try {
+            recordDao.deleteAllBySerialIds(new Integer[]{id});//删除序列号
             serialDao.updateSetGameIdNullByIds(new Integer[]{id});
             serialDao.deleteById(id);
             return ResponseResult.defSuccessful(true);
@@ -99,6 +100,7 @@ public class SerialService {
     @Transactional
     public ResponseResult<Boolean> delSerials(Integer[] ids) {
         try {
+            recordDao.deleteAllBySerialIds(ids);//删除序列号
             serialDao.updateSetGameIdNullByIds(ids);//断开与游戏的关联
             serialDao.delAllSerialsByIds(ids);
             return ResponseResult.defSuccessful();

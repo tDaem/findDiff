@@ -67,7 +67,7 @@ function initTable(form) {
 
 /*关卡-删除*/
 function game_del(obj, id) {
-    layer.confirm('确认要删除吗？', function (index) {
+    layer.confirm('确认要删除吗？（删除此游戏将清空此游戏的游戏记录，如有必要请在数据维护中导出数据！）', function (index) {
         //发异步删除数据
         $.ajax({
             url: '/game/' + id,
@@ -94,7 +94,7 @@ function delAll(argument) {
         }
     });
     console.log('ids:' + ids)
-    layer.confirm('确认要删除吗？', function (index) {
+    layer.confirm('确认要删除吗？（删除此游戏将清空此游戏的游戏记录，如有必要请在数据维护中导出数据！）', function (index) {
         //捉到所有被选中的，发异步进行删除
         $.ajax({
             url: '/games',
