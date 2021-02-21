@@ -133,4 +133,16 @@ public class SerialService {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
     }
+
+    @Transactional
+    public ResponseResult<Void> resetSerials() {
+        try {
+            recordDao.deleteAll();
+            serialDao.resetSerialsState();
+            return ResponseResult.defSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
 }

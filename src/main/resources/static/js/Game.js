@@ -17,9 +17,9 @@ function Game(box) {//初始化 将图片添加到main中 播放音乐 添加监
  * @type {{cursor: string, width: string, position: string, "min-width": string, height: string}}
  */
 Game.prototype.LR = {
-    'min-width': '900px',
-    'width': '900px',
-    'height': '565px',
+    'min-width': boxW,
+    'width': boxW,
+    'height': boxH,
     'cursor': 'pointer',
     position: 'relative'
 }
@@ -29,9 +29,9 @@ Game.prototype.LR = {
  * @type {{cursor: string, width: string, position: string, "min-width": string, height: string}}
  */
 Game.prototype.UD = {
-    'min-width': '565px',
-    'width': '565px',
-    'height': '900px',
+    'min-width': boxH,
+    'width': boxH,
+    'height': boxW,
     'cursor': 'pointer',
     'position': 'relative'
 }

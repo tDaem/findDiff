@@ -66,13 +66,13 @@ GameScene.prototype.initGame = function (prevScene) {
         $(this.game.box).css(this.game.UD)
         console.log(this.skipBtn)
         this.skipBtn.$ele.css({
-            left: '565px',
+            left: boxH,
             bottom: '0'
         })
     } else {
         $(this.game.box).css(this.game.LR)
         this.skipBtn.$ele.css({
-            left: '852px',
+            left: '752px',//800-48
             bottom: '-40px'
         })
     }

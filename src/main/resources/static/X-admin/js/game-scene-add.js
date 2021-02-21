@@ -21,11 +21,11 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                         var width, height
                         img.onload = () => {
                             if (img.width > img.height) {
-                                width = '900px'
-                                height = '565px'
+                                width = boxW
+                                height = boxH
                             } else {
-                                width = '565px'
-                                height = '900px'
+                                width = boxH
+                                height = boxW
                             }
                             var imgHtml = "<img id='testImg' style='width: " + width + ";height: " + height + ";' src='" + result + "' />";
                             //弹出层
@@ -33,7 +33,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                                 type: 1,
                                 shade: 0.8,
                                 offset: 'auto',
-                                area: [width + 'px', height + 'px'],
+                                area: [width, height],
                                 shadeClose: true,//点击外围关闭弹窗
                                 scrollbar: false,//不现实滚动条
                                 title: "图片预览", //不显示标题

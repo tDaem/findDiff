@@ -82,4 +82,9 @@ public class SerialController {
     public ResponseResult<Serial> updateSerialStatus(Integer serialId, SerialStatus serialStatus) {
         return serialService.updateSerialBySerialId(serialId, serialStatus);
     }
+
+    @GetMapping(value = "/resetSerials")
+    public ResponseResult<Void> resetSerials(){
+        return serialService.resetSerials();
+    }
 }

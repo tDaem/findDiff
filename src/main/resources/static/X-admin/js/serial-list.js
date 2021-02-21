@@ -179,3 +179,18 @@ function delAll(argument) {
 }
 
 
+function resetSerial() {
+    layer.confirm('此操作将会清空所有的游戏记录数据，并将序号重置为未使用状态，确定重置序号吗？', function (index) {
+        $.ajax({
+            url: '/resetSerials',
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                if (res.code > 0)
+                    return layer.msg('操作失败！', {icon: 2});
+                layer.msg('重置成功', {icon: 1});
+            }
+        })
+    });
+
+}

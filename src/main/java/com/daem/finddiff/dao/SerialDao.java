@@ -40,4 +40,8 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
     @Modifying
     @Query("update Serial s set s.game.id = null where s.id in :ids")
     void updateSetGameIdNullByIds(Integer[] ids);
+
+    @Modifying
+    @Query("update Serial s set s.serialStatus = 0")
+    void resetSerialsState();
 }
