@@ -38,7 +38,7 @@ function initTable(form) {
                     '                            </td>' +
                     '                            <td>' + v.gameSceneName + '</td>' +
                     '                            <td class="td-status">' +
-                    '                                <span class="layui-btn layui-btn-normal layui-btn-mini" onclick="previewImg(\'' + v.imgPath + '\')">预览</span>' +
+                    '                                <span class="layui-btn layui-btn-normal layui-btn-mini" onclick="previewImg(\'' + v.imgPath + '\',\'' + v.structure + '\')">预览</span>' +
                     '                            </td>' +
                     '                            <td class="td-manage">' +
                     '                                <a title="编辑" onclick="xadmin.open(\'编辑\',\'game-scene-edit.html?gameSceneId=' + v.id + '\',600,400)"' +
@@ -120,18 +120,22 @@ function delAll(argument) {
     });
 }
 
-function previewImg(imgPath) {
-    var img = new Image();
-    img.src = imgPath;
-    var height = img.height + 50; //获取图片高度
-    var width = img.width; //获取图片宽度
+function previewImg(imgPath, structure) {
+    var width, height
+    if (structure === 'UP_AND_DOWN') {
+        width = boxH
+        height = boxW
+    } else {
+        width = boxW
+        height = boxH
+    }
     var imgHtml = "<img style='width: 100%;height: 100%;' src='" + imgPath + "' />";
     //弹出层
     layer.open({
         type: 1,
         shade: 0.8,
         offset: 'auto',
-        area: [width + 'px', height + 'px'],
+        area: [width, height],
         shadeClose: true,//点击外围关闭弹窗
         scrollbar: true,//不现实滚动条
         title: "图片预览", //不显示标题
