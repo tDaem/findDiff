@@ -151,7 +151,7 @@ layui.use(['laydate', 'form', 'jquery', 'table', 'excel'],
                             //导出excel
                             excel.exportExcel({
                                 sheet1: bodysArr
-                            }, '擦拭数据' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+                            }, '测试数据' + new Date().toLocaleString() + '.xlsx', 'xlsx');
                         }
                     },
                     complete: () => {
