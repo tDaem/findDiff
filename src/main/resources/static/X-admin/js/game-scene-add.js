@@ -5,6 +5,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
             layer = layui.layer,
             upload = layui.upload;
 
+        var sourceImgPath
         //普通图片上传
         var uploadInst = upload.render({
             elem: '#L_image',
@@ -58,6 +59,10 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                     return layer.msg('上传失败', {icon: 2});
                 } else {
                     $('input[name=imgPath]').val(res.data)
+                    //如果之前已经上传，则删除原图片
+                    if (sourceImgPath)
+                        deleteFile(sourceImgPath)
+                    sourceImgPath = res.data
                 }
             },
             error: function () {
@@ -125,6 +130,9 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
 
     });
 
+function deleteFile(path) {
+
+}
 
 /**
  * 生成游戏关卡提交到后台的json数据
