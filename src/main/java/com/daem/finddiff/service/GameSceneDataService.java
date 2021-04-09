@@ -68,10 +68,7 @@ public class GameSceneDataService {
     public ResponseResult<GameSceneData> getGameSceneData(Integer id) {
         try {
             Optional<GameSceneData> optionalGameSceneData = gameSceneDataDao.findById(id);
-            if (optionalGameSceneData.isPresent()) {
-                return ResponseResult.defSuccessful(optionalGameSceneData.get());
-            }
-            return ResponseResult.defFailed("该游戏数据可能已被删除！");
+            return optionalGameSceneData.map(ResponseResult::defSuccessful).orElseGet(() -> ResponseResult.defFailed("该游戏数据可能已被删除！"));
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
@@ -80,19 +77,16 @@ public class GameSceneDataService {
     @Transactional
     public ResponseResult<GameSceneData> delGameSceneData(Integer id) {
         try {
+            //删除关卡的记录
             recordDao.deleteAllByGameSceneDataId(id);
-            //找出绑定了游戏的关卡
-            List<Game> games = gameDao.findAll().stream().filter(game -> {
-                List<GameSceneData> gameSceneDatas = game.getGameSceneDatas();
-                for (GameSceneData gameSceneData : gameSceneDatas) {
-                    return gameSceneData.getId().equals(id);
-                }
-                return false;
-            }).collect(Collectors.toList());
-            for (Game g : games) {
-                g.setGameSceneDatas(null);
-                gameDao.save(g);
-            }
+
+            Optional<GameSceneData> gameSceneDataOptional = gameSceneDataDao.findById(id);
+            gameSceneDataOptional.ifPresent(gameSceneData -> {
+                gameSceneData.getGames().forEach(game -> {
+                    //从游戏关卡中移除该游戏
+                    game.getGameSceneDatas().remove(gameSceneData);
+                });
+            });
             gameSceneDataDao.deleteById(id);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {
@@ -134,6 +128,15 @@ public class GameSceneDataService {
             gameSceneDataDao.delByIds(ids);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        }
+    }
+
+    public ResponseResult<List<GameSceneData>> getAllGameSceneDataByGameId(Integer gameId) {
+        try{
+            return ResponseResult.defSuccessful(gameSceneDataDao.getAllByGameId(gameId));
+        } catch (Exception e){
             e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }

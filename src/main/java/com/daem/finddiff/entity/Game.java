@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,7 +41,12 @@ public class Game {
      * 一个游戏有多个找不同的关卡组成
      */
     @ManyToMany
-    @OrderBy("id")
+    @JoinTable(name = "game_game_scene_datas",
+            //当前对象在中间表的外键
+            joinColumns = {@JoinColumn(name = "games_id", referencedColumnName = "id")},
+            //对方对象在中间表的外键
+            inverseJoinColumns = {@JoinColumn(name = "game_scene_datas_id", referencedColumnName = "id")}
+    )
     private List<GameSceneData> gameSceneDatas;
 
     /**

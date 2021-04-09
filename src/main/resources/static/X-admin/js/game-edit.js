@@ -23,7 +23,9 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                     '<div>' +
                     '   <div class="layui-inline">' +
                     '       <div class="layui-input-inline">' +
-                    '           <select name="gameScenes" lay-verify="required">'
+                    '           <select name="gameScenes" lay-verify="required" lay-filter="select">' +
+                    '               <option value="">-----</option>'
+
                 $.each(ret.data, function (inx, item) {
                     selectHtml +=
                                     '<option value="' + item.id + '">' + item.gameSceneName + '</option>'
@@ -79,6 +81,24 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                 layer.msg("没有游戏关卡，请先新增游戏关卡", {icon: 0})
             form.render()
         })
+
+        //form.render('select');
+        form.on('select(select)', function(data){
+            console.log(data)
+            let selects = $('select option:selected')
+            if (data.value){
+                var cnt = 0
+                selects.each(function (index) {
+                    if ($(selects[index]).val() == data.value)
+                        cnt ++
+                })
+                if (cnt != 1){
+                    $(data.elem).find("option[value='']").prop("selected",true);
+                    form.render('select')
+                    layer.msg('该关卡已在游戏中存在！')
+                }
+            }
+        });
 
         //监听提交
         form.on('submit(add)',

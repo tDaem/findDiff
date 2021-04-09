@@ -42,6 +42,10 @@ function initTable(form) {
                     '                                   href="javascript:;">' +
                     '                                    <i class="layui-icon">&#xe642;</i>' +
                     '                                </a>' +
+                    '                                <a title="关卡排序" onclick="xadmin.open(\'关卡排序\',\'game-scene-sort.html?gameId=' + v.id + '\',600,400)"' +
+                    '                                   href="javascript:;">' +
+                    '                                    <i class="layui-icon">&#x21c5;</i>' +
+                    '                                </a>' +
                     '                                <a title="删除" onclick="game_del(this,' + v.id + ')" href="javascript:;">' +
                     '                                    <i class="layui-icon">&#xe640;</i>' +
                     '                                </a>' +

@@ -41,6 +41,11 @@ public class GameSceneDataController {
         return gameSceneDataService.getAllGameSceneData();
     }
 
+    @GetMapping(value = "/gameSceneDatasByGameId")
+    public ResponseResult<List<GameSceneData>> getAllGameSceneDataByGameId(Integer gameId){
+        return gameSceneDataService.getAllGameSceneDataByGameId(gameId);
+    }
+
     @GetMapping(value = "/gameSceneData/{id}")
     public ResponseResult<GameSceneData> getGameSceneData(@PathVariable Integer id){
         return gameSceneDataService.getGameSceneData(id);

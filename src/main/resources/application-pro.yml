@@ -32,6 +32,9 @@ spring:
 
 
 
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 file:
   path: ./upload/ #图片上传的存放路径x
 #  path: E:/upload/ #图片上传的存放路径x

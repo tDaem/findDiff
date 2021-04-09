@@ -3,7 +3,6 @@ package com.daem.finddiff.service;
 import com.daem.finddiff.dao.GameSceneDataDao;
 import com.daem.finddiff.dao.RecordDao;
 import com.daem.finddiff.dto.ResponseResult;
-import com.daem.finddiff.dto.TBodyDto;
 import com.daem.finddiff.entity.GameSceneData;
 import com.daem.finddiff.entity.Record;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +41,8 @@ public class RecordService {
         try {
             Map<String, Object> result = new LinkedHashMap<>();
             List<Record> records = recordDao.findAllByGameId(gameId);
-            Map<Integer, Map<Integer, List<Record>>> roomMap = records.stream().collect(Collectors.groupingBy(Record::getRoomNum, Collectors.groupingBy(record -> record.getGameSceneData().getId())));
+            Map<Integer, Map<Integer, List<Record>>> roomMap = records.stream().
+                    collect(Collectors.groupingBy(Record::getRoomNum, Collectors.groupingBy(record -> record.getGameSceneData().getId())));
             int maxDiff = 0;
             for (int i = 0; i < records.size(); i++) {
                 Record record = records.get(i);
@@ -61,6 +63,7 @@ public class RecordService {
             }
             tHeads.put("isSkip", "是否跳过的关卡");
             tHeads.put("lastToSkipHitNum", "最后一次点中到跳过的点击次数");
+            tHeads.put("lastToSkipHitTime", "最后一次点中到跳过的时间（s）");
             tHeads.put("finishTime", "关卡完成的时间(s)");
 
 
@@ -70,14 +73,18 @@ public class RecordService {
             List<String> players = new ArrayList<>();
 
             for (Integer roomNum : roomMap.keySet()) {//遍历房间
-                for (int i = 0; i < records.size(); i++) {//该房间中的玩家
-                    Record record = records.get(i);
+                List<Record> recordsByRoomNum = recordDao.findAllByRoomNum(roomNum);
+                players.clear();
+                for (int i = 0; i < recordsByRoomNum.size(); i++) {//该房间中的玩家
+                    Record record = recordsByRoomNum.get(i);
                     if (!players.contains(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")")) {
                         players.add(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
                     }
                 }
 
-                for (Integer gameSceneDataId : roomMap.get(roomNum).keySet()) {//遍历关卡
+                Set<Integer> gameSceneDataIds = roomMap.get(roomNum).keySet();
+                List<Integer> sortedGameSceneDataIds = gameSceneDataIds.stream().sorted().collect(Collectors.toList());
+                for (Integer gameSceneDataId : sortedGameSceneDataIds) {//遍历关卡
                     List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);
                     Map<String, String> tBodyMap = new LinkedHashMap<>();
                     tBodyMap.put("roomNum", roomNum.toString());
@@ -120,8 +127,21 @@ public class RecordService {
                     }
 
                     if (recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex() < gameSceneData.getDiffsCoordinates().size()) {
-                        long num = recordsGroupByGameScene.stream().filter(record -> record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex()).count() - 2;
+                        AtomicLong lastHitTime = new AtomicLong();
+                        AtomicLong skipTime = new AtomicLong();
+                        AtomicBoolean firstFlag = new AtomicBoolean(true);
+                        long num = recordsGroupByGameScene.stream().filter(record -> {
+                            boolean res = record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex();
+                            if (firstFlag.get() && res) {
+                                lastHitTime.set(record.getTime());
+                                firstFlag.set(false);
+                            }
+                            if (record.isSkip())
+                                skipTime.set(record.getTime());
+                            return res;
+                        }).count() - 2;
                         tBodyMap.put("lastToSkipHitNum", String.valueOf(num));
+                        tBodyMap.put("lastToSkipHitTime", String.valueOf((skipTime.get() - lastHitTime.get()) / 1000));
                     }
                     tBodyMap.put("finishTime", String.valueOf((recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getTime() - recordsGroupByGameScene.get(0).getTime()) / 1000));
                     tBodyDtos.add(tBodyMap);
@@ -141,7 +161,7 @@ public class RecordService {
         try {
             recordDao.deleteAllBySerial_Game_Id(gameId);
             return ResponseResult.defSuccessful();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }
@@ -152,7 +172,7 @@ public class RecordService {
         try {
             recordDao.deleteAll();
             return ResponseResult.defSuccessful();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseResult.defFailed("数据异常！", e.getMessage());
         }

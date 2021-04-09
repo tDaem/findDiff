@@ -1,18 +1,20 @@
 package com.daem.finddiff.service;
 
 import com.daem.finddiff.dao.GameDao;
+import com.daem.finddiff.dao.GameGameSceneDataDao;
+import com.daem.finddiff.dao.GameSceneDataDao;
 import com.daem.finddiff.dao.SerialDao;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.Game;
-import com.daem.finddiff.entity.Serial;
+import com.daem.finddiff.entity.GameGameSceneData;
+import com.daem.finddiff.entity.GameSceneData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * @Description
@@ -27,6 +29,12 @@ public class GameService {
 
     @Autowired
     private SerialDao serialDao;
+
+    @Autowired
+    private GameGameSceneDataDao gameGameSceneDataDao;
+
+    @Autowired
+    private GameSceneDataDao gameSceneDataDao;
 
 
     public ResponseResult<Game> saveGame(Game game) {
@@ -48,7 +56,15 @@ public class GameService {
         try {
             Optional<Game> optionalGame = gameDao.findById(id);
             if (optionalGame.isPresent()) {
-                return ResponseResult.defSuccessful(optionalGame.get());
+                Game game = optionalGame.get();
+                List<GameGameSceneData> gameGameSceneDatas = gameGameSceneDataDao.getAllByGameId(id);
+                List<GameSceneData> sortedGameScenes = new ArrayList<>();
+                gameGameSceneDatas.forEach(gameGameSceneData -> {
+                    sortedGameScenes.add(gameSceneDataDao.getOne(gameGameSceneData.getGameGameSceneDataUPK().getGameSceneDataId()));
+                });
+
+                game.setGameSceneDatas(sortedGameScenes);
+                return ResponseResult.defSuccessful(game);
             }
             return ResponseResult.defFailed("该游戏数据可能已被删除！");
         } catch (Exception e) {
@@ -64,7 +80,7 @@ public class GameService {
      */
     public ResponseResult<Boolean> delGame(Integer id) {
         try {
-            serialDao.findAllByGame_Id(id).stream().forEach(serial -> {
+            serialDao.findAllByGame_Id(id).forEach(serial -> {
                 serial.setGame(null);
                 serialDao.save(serial);
             });

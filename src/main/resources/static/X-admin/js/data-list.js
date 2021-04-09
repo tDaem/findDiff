@@ -56,7 +56,7 @@ layui.use(['laydate', 'form', 'jquery', 'table', 'excel'],
                 //等效效果
                 let loading = layer.load(0, {
                     shade: false,
-                    time: 2 * 1000
+                    time: 1200
                 });
                 $.ajax({
                     url: '/records?gameId=' + $('select option:selected').val(),
@@ -82,6 +82,7 @@ layui.use(['laydate', 'form', 'jquery', 'table', 'excel'],
                         table.render({
                             elem: '#records',
                             page: false,
+                            limit: ret.data.tBody.length,
                             toolbar: '#toolbarDemo',
                             defaultToolbar: ['print'],
                             cols: [cols],

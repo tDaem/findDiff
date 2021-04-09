@@ -9,9 +9,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * @Description 游戏数据,表示一个关卡
+ * @Description 游戏数据, 表示一个关卡
  * @Author tyx
  * @Date 2021/1/26
  */
@@ -39,6 +40,7 @@ public class GameSceneData {
 
     /**
      * 图片的结构
+     *
      * @see Structure
      */
     @Column(nullable = false)
@@ -129,5 +131,18 @@ public class GameSceneData {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameSceneData that = (GameSceneData) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
