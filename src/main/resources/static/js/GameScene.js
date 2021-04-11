@@ -13,6 +13,9 @@ function GameScene(game, datas) {
         $(game.box).css(game.LR)
     }
     this.diffIndex = 0
+
+    //是否禁止点击时发送数据
+    this.clickDisabled = false
     /**
      * 保存游戏数据
      * {
@@ -50,10 +53,7 @@ GameScene.prototype.initGame = function (prevScene) {
 
     this.skipBtn = new SkipButton(this.game.box, {})
 
-    this.confirmBtn = new ConfirmButton(this.game.box, {
-        left: '825px',
-        bottom: '54px'
-    })
+    this.confirmBtn = new ConfirmButton(this.game.box, {})
     // this.secondManager = new SecondManager(this.game.box, this.data.seconds)
     // this.label = new Label(this.game.box, this.data.fakeCnt || this.data.diffs.length)
 
@@ -62,6 +62,7 @@ GameScene.prototype.initGame = function (prevScene) {
 
     // this.fullScreenBtn.show()
     this.skipBtn.show()
+    this.confirmBtn.show()
     if (this.data.structure === 'UP_AND_DOWN') {
         $(this.game.box).css(this.game.UD)
         console.log(this.skipBtn)
@@ -73,6 +74,10 @@ GameScene.prototype.initGame = function (prevScene) {
         $(this.game.box).css(this.game.LR)
         this.skipBtn.$ele.css({
             left: '752px',//800-48
+            bottom: '-40px'
+        })
+        this.confirmBtn.$ele.css({
+            left: '700px',//800-48*2 -4
             bottom: '-40px'
         })
     }
@@ -208,49 +213,81 @@ GameScene.prototype.processData = function (diff) {
         time: new Date().getTime(),//当前操作的时间
         hit: false//是否命中不同点
     }
-    if (this.differences.check(diff.x, diff.y)) {
-        record.start = false
-        record.diffIndex = ++this.diffIndex
-        record.hit = true
-        //蓝底变色
+
+    //直接画圆
+    var flag = boxWidth > boxHeight
+    var left = diff.x - radius
+    var top = diff.y - radius
+    var left_1
+    var top_1
+    if (flag) {
+        left_1 = diff.x - radius - boxWidth / 2
+        top_1 = diff.y - radius
     } else {
-        var flag = boxWidth > boxHeight
-        var errorLeft = diff.x - radius
-        var errorTop = diff.y - radius
-        var errorLeft_1
-        var errorTop_1
-        if (flag) {
-            errorLeft_1 = diff.x - radius - boxWidth / 2
-            errorTop_1 = diff.y - radius
-        } else {
-            errorLeft_1 = diff.x - radius
-            errorTop_1 = diff.y - radius - boxHeight / 2
-        }
-
-        this.differences.show(null, errorLeft, errorTop)
-        //对称部分也同时画圈
-        this.differences.show(null, errorLeft_1, errorTop_1)
-
-        //需要记录的数据
-        record.start = false
-        record.hit = false
+        left_1 = diff.x - radius
+        top_1 = diff.y - radius - boxHeight / 2
     }
+    //记录坐标，用于点击确定是判断是否点中用
+    this.x = diff.x
+    this.y = diff.y
+
+    //当前点击正在显示的圆圈（为错误时擦除用）
+    this.diffDiv = this.differences.show(diff, left, top)
+    //对称部分也同时画圈
+    this.diffDiv1 = this.differences.show(diff, left_1, top_1)
+
+    //此时不在处理点击事件
+    this.clickDisabled = true
+    //点击确定的时候检查坐标
+    // if (this.differences.check(diff.x, diff.y)) {
+    //     record.start = false
+    //     record.diffIndex = ++this.diffIndex
+    //     record.hit = true
+    //     //蓝底变色
+    // } else {
+    //     var flag = boxWidth > boxHeight
+    //     var errorLeft = diff.x - radius
+    //     var errorTop = diff.y - radius
+    //     var errorLeft_1
+    //     var errorTop_1
+    //     if (flag) {
+    //         errorLeft_1 = diff.x - radius - boxWidth / 2
+    //         errorTop_1 = diff.y - radius
+    //     } else {
+    //         errorLeft_1 = diff.x - radius
+    //         errorTop_1 = diff.y - radius - boxHeight / 2
+    //     }
+    //
+    //     this.differences.show(null, errorLeft, errorTop)
+    //     //对称部分也同时画圈
+    //     this.differences.show(null, errorLeft_1, errorTop_1)
+    //
+    //     //需要记录的数据
+    //     record.start = false
+    //     record.hit = false
+    // }
     this.records.push(record)
     console.log(this.records)
-
-    if (this.data.diffsCoordinates.length === this.diffIndex)
-        setTimeout(() => {
-            this.next()
-        }, 1000)
+    //
+    // if (this.data.diffsCoordinates.length === this.diffIndex)
+    //     setTimeout(() => {
+    //         this.next()
+    //     }, 1000)
 }
 
 // 重写点击监听函数（记录数据）
 GameScene.prototype.clickListener = function (x, y) {
-    console.log('game scene click!')
-    Scene.webSocket.send(JSON.stringify({
-        x: x,
-        y: y
-    }))
+    if (!this.clickDisabled) {
+        console.log('game scene click!')
+        Scene.webSocket.send(JSON.stringify({
+            x: x,
+            y: y
+        }))
+    } else {
+        //提示需要点击确定
+        console.log("请点击确定按钮提交数据！")
+        floatDialog("请先点击确定按钮！")
+    }
 }
 
 /**
@@ -280,62 +317,100 @@ GameScene.prototype.reset = function (start) {
 
 /**
  * 点击确认时的方法
+ * @param x 点击的坐标x
+ * @param y 点击的坐标y
+ * @returns {boolean}
  */
-GameScene.prototype.confirm = function (event) {
-    if (this.data.fakeCnt && this.data.diffs.length < this.data.fakeCnt || this.label.value > 0) {
-        var option = {
-            title: '温馨提示',
-            content: '还有' + (this.label.value) + '处不同未找到!',
-            okValue: '确定',
-            ok: function () {
-                return true
-            }
-        }
-        dialog(option)
-            .width(200)
-            .showModal()
+GameScene.prototype.confirm = function () {
+    if (!this.diffDiv) {//进入下一关时，确保点击确定无反应
+        floatDialog("请寻找不同处！")
     } else {
-        this.pass()
+        var record = this.records[this.records.length - 1]
+        var hit = this.differences.check(this.x, this.y);
+        if (!hit) {//没有命中  移除圆圈，并记录数据
+            this.diffDiv.remove()
+            this.diffDiv1.remove()
+            //记录数据
+            record.start = false
+            record.hit = false
+        } else {
+            record.start = false
+            record.diffIndex = ++this.diffIndex
+            record.hit = true
+        }
+        this.clickDisabled = false;
+        //重置坐标参数和上次点击的圆圈
+        this.diffDiv = null
+        this.diffDiv1 = null
+        this.x = Number.MIN_VALUE
+        this.y = Number.MIN_VALUE
+
+        //如果全部找出来 则进入下一关
+        if (this.data.diffsCoordinates.length === this.diffIndex)
+            setTimeout(() => {
+                this.next()
+            }, 350)
     }
     return false
+}
+
+/**
+ * 浮动的提醒消息
+ * @param msg
+ * @param delay 延时多少秒后消失,默认0.5s
+ */
+var floatDialog = function (msg, delay) {
+    var d = dialog({
+        content: msg
+    });
+    d.show();
+    setTimeout(function () {
+        d.close().remove();
+    }, 500 || delay);
 }
 
 /**
  * 点击跳过按钮时执行的方法
  */
 GameScene.prototype.skip = function () {
-    var option = {
-        title: '温馨提示',
-        content: '确定跳过这一关吗？',
-        okValue: '确定',
-        ok: function () {
-            this.records.push({
-                roomNum: this.params.roomNum,
-                start: false,//是否开始游戏时
-                skip: true,//跳过
-                diffIndex: this.diffIndex,//第几处不同
-                gameSceneData: {//当前游戏场景
-                    id: this.data.id
-                },
-                serial: {//当前游戏序列号
-                    id: this.params.serial.id
-                },
-                time: new Date().getTime(),//当前操作的时间
-                hit: false//是否命中不同点
-            })
-            console.log(this.records)
-            //发送消息
-            Scene.webSocket.send('next')
-            return true;
-        }.bind(this),//修改this指向
-        cancelValue: '取消',
-        cancel: function () {
+    if (this.clickDisabled) {
+        //提示 你已经点击了一处，但没有点击确定！
+        console.log("你已经点击了一处，但没有点击确定！")
+        floatDialog("你已经点击了一处，但没有点击确定！")
+    } else {
+        var option = {
+            title: '温馨提示',
+            content: '确定跳过这一关吗？',
+            okValue: '确定',
+            ok: function () {
+                this.records.push({
+                    roomNum: this.params.roomNum,
+                    start: false,//是否开始游戏时
+                    skip: true,//跳过
+                    diffIndex: this.diffIndex,//第几处不同
+                    gameSceneData: {//当前游戏场景
+                        id: this.data.id
+                    },
+                    serial: {//当前游戏序列号
+                        id: this.params.serial.id
+                    },
+                    time: new Date().getTime(),//当前操作的时间
+                    hit: false//是否命中不同点
+                })
+                console.log(this.records)
+                //发送消息
+                Scene.webSocket.send('next')
+                return true;
+            }.bind(this),//修改this指向
+            cancelValue: '取消',
+            cancel: function () {
+            }
         }
+        //先提示是否跳过
+        dialog(option)
+            .width(200)
+            .showModal();
     }
-    //先提示是否跳过
-    dialog(option)
-        .width(200)
-        .showModal();
     return false
 }
 /**
@@ -357,13 +432,21 @@ GameScene.prototype.next = function () {
                 $(this.game.box).css(this.game.UD)
                 console.log(this.skipBtn)
                 this.skipBtn.$ele.css({
-                    left: '565px',
+                    left: '505px',
                     bottom: '0'
+                })
+                this.confirmBtn.$ele.css({
+                    left: '505px',
+                    bottom: '68px'
                 })
             } else {
                 $(this.game.box).css(this.game.LR)
                 this.skipBtn.$ele.css({
-                    left: '852px',
+                    left: '752px',
+                    bottom: '-40px'
+                })
+                this.confirmBtn.$ele.css({
+                    left: '700px',
                     bottom: '-40px'
                 })
             }

@@ -28,20 +28,20 @@ Differences.prototype.check = function (x, y, noDraw) {
         if (x > left && x < right && y > top && y < bottom) {
             if (!noDraw){
                 // 如果坐标点中“不同”，使用相关数据画圈
-                var flag = $(this.game.box).width() > $(this.game.box).height()
-                var left_1
-                var top_1
-                if (flag){
-                    left_1 = diff.x - radius - $(this.game.box).width() / 2
-                    top_1 = diff.y - radius
-                }else {
-                    left_1 = diff.x - radius
-                    top_1 = diff.y - radius - $(this.game.box).height() / 2
-                }
+                // var flag = $(this.game.box).width() > $(this.game.box).height()
+                // var left_1
+                // var top_1
+                // if (flag){
+                //     left_1 = diff.x - radius - $(this.game.box).width() / 2
+                //     top_1 = diff.y - radius
+                // }else {
+                //     left_1 = diff.x - radius
+                //     top_1 = diff.y - radius - $(this.game.box).height() / 2
+                // }
 
-                this.show(diff, left, top)
-                //左边也同时画圈
-                this.show(diff, left_1, top_1)
+                // this.show(diff, left, top)
+                // //左边也同时画圈
+                // this.show(diff, left_1, top_1)
             }
             return true
         }
@@ -67,13 +67,10 @@ Differences.prototype.show = function (diff, left, top) {
             return false
         }
     )
-    if (diff) {
-        diff.showed = true
-    } else {
-        setTimeout(() => {
-            diffDiv.remove()
-        }, delayTime)
-    }
+    // if (diff) {
+    //     diff.showed = true
+    // }
+    return diffDiv
 }
 
 // 重置

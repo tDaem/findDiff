@@ -58,7 +58,7 @@ public class RecordService {
             tHeads.put("totalDiffNum", "总共的不同数");
             tHeads.put("hitDiffNum", "点中的不同数");
             for (int i = 1; i < maxDiff + 1; i++) {
-                tHeads.put("hitNo" + i + "Diff", "点中第" + i + "处不同所花事件（s）");
+                tHeads.put("hitNo" + i + "Diff", "点中第" + i + "处不同所花时间（s）");
                 tHeads.put("hitNo" + i + "DiffPlayer", "点中第" + i + "处不同玩家");
             }
             tHeads.put("isSkip", "是否跳过的关卡");
@@ -84,8 +84,10 @@ public class RecordService {
 
                 Set<Integer> gameSceneDataIds = roomMap.get(roomNum).keySet();
                 List<Integer> sortedGameSceneDataIds = gameSceneDataIds.stream().sorted().collect(Collectors.toList());
-                for (Integer gameSceneDataId : sortedGameSceneDataIds) {//遍历关卡
-                    List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);
+                boolean firstGameScene = true;//表示该游戏的第一张关卡，因为第一张关卡会多一条start=true的记录
+                for (int m = 0; m< sortedGameSceneDataIds.size(); m++ ) {//遍历关卡
+                    Integer gameSceneDataId = sortedGameSceneDataIds.get(m);
+                    List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);//获取房间中某关卡的所有记录
                     Map<String, String> tBodyMap = new LinkedHashMap<>();
                     tBodyMap.put("roomNum", roomNum.toString());
                     GameSceneData gameSceneData = gameSceneDataDao.getOne(gameSceneDataId);
@@ -106,7 +108,7 @@ public class RecordService {
                         for (int j = 0; j < recordsGroupByGameScene.size(); j++) {
                             Record record = recordsGroupByGameScene.get(j);
                             if (record.getDiffIndex() == i) {
-                                tBodyMap.put("hitNo" + i + "Diff", String.valueOf((record.getTime() - recordsGroupByGameScene.get(lastHitIndex).getTime()) / 1000));
+                                tBodyMap.put("hitNo" + i + "Diff", String.format("%.3f", ((record.getTime() - recordsGroupByGameScene.get(lastHitIndex).getTime()) / 1000.0)));
                                 tBodyMap.put("hitNo" + i + "DiffPlayer", record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
                                 lastHitIndex = j;
                                 break;
@@ -126,24 +128,29 @@ public class RecordService {
                         }
                     }
 
-                    if (recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex() < gameSceneData.getDiffsCoordinates().size()) {
-                        AtomicLong lastHitTime = new AtomicLong();
-                        AtomicLong skipTime = new AtomicLong();
+                    if (recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex() < gameSceneData.getDiffsCoordinates().size()) {//如果点中的索引值小于关卡的所有不同数，则该关卡被跳过
+                        AtomicLong lastHitTime = new AtomicLong();//最后一次点击的时间
+                        AtomicLong skipTime = new AtomicLong();//点击跳过按钮的时间
                         AtomicBoolean firstFlag = new AtomicBoolean(true);
                         long num = recordsGroupByGameScene.stream().filter(record -> {
-                            boolean res = record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex();
+                            boolean res = record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex();//获取该关卡最后一次点击记录的索引（表示统计命中后到跳过点击的次数）
                             if (firstFlag.get() && res) {
                                 lastHitTime.set(record.getTime());
                                 firstFlag.set(false);
                             }
-                            if (record.isSkip())
+                            if (record.isSkip())//获取关卡跳过的时间
                                 skipTime.set(record.getTime());
                             return res;
-                        }).count() - 2;
+                        }).count();
+                        if (m == 0){//表示是当前游戏的第一张关卡
+                            num = num - 2;//除去start=true的记录
+                        } else {
+                            num = num - 1;
+                        }
                         tBodyMap.put("lastToSkipHitNum", String.valueOf(num));
-                        tBodyMap.put("lastToSkipHitTime", String.valueOf((skipTime.get() - lastHitTime.get()) / 1000));
+                        tBodyMap.put("lastToSkipHitTime", String.format("%.3f", (skipTime.get() - lastHitTime.get()) / 1000.0));
                     }
-                    tBodyMap.put("finishTime", String.valueOf((recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getTime() - recordsGroupByGameScene.get(0).getTime()) / 1000));
+                    tBodyMap.put("finishTime", String.format("%.3f", (recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getTime() - recordsGroupByGameScene.get(0).getTime()) / 1000.0));
                     tBodyDtos.add(tBodyMap);
                 }
             }
