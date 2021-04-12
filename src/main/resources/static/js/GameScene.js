@@ -452,11 +452,28 @@ GameScene.prototype.next = function () {
             }
             // 添加下一个“不同”的图片到页面上
             this.$ele = $('<img>').attr('src', this.data.imgPath).prependTo(this.game.box)
+
+
         })
 
         this.reset()
 
         this.differences = new Differences(this.game, this.data)
+
+        this.records.push({
+            roomNum: this.params.roomNum,
+            start: true,//是否开始游戏时
+            skip: false,//跳过
+            diffIndex: this.diffIndex,//第几处不同
+            gameSceneData: {//当前游戏场景
+                id: this.data.id
+            },
+            serial: {//当前游戏序列号
+                id: this.params.serial.id
+            },
+            time: new Date().getTime(),//当前操作的时间
+            hit: false//是否命中不同点
+        })
     } else {
         this.differences.reset()
         this.game.complete()
