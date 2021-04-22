@@ -1,5 +1,6 @@
 package com.daem.finddiff.service;
 
+import com.daem.finddiff.dto.ClickData;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class RoomService {
      */
     private static final Map<Integer, List<Session>> rooms = new HashMap<>();
     //房间中点击的坐标
-    private static final Map<Integer, DiffsCoordinate> diffsCoordinateMap = new HashMap<>();
+    private static final Map<Integer, ClickData> diffsCoordinateMap = new HashMap<>();
 
     /**
      * 创建房间号
@@ -62,12 +63,12 @@ public class RoomService {
      * @param roomNum
      * @return
      */
-    public static DiffsCoordinate getDiffsCoordinate(int roomNum) {
+    public static ClickData getClickData(int roomNum) {
         return diffsCoordinateMap.get(roomNum);
     }
 
-    public static void putDiffsCoordinate(int roomNum, DiffsCoordinate diffsCoordinate) {
-        diffsCoordinateMap.put(roomNum, diffsCoordinate);
+    public static void putClickData(int roomNum, ClickData clickData) {
+        diffsCoordinateMap.put(roomNum, clickData);
     }
 
     /**

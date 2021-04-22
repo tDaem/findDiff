@@ -1,6 +1,6 @@
 // 登录场景
 function LoginScene(game, src, params) {
-    src = src || 'images/login_bg.png'
+    src = src || 'images/login_bg.jpg'
     // 调用父类构造函数
     // 使用别人构造函数构造自己的对象
     Scene.call(this, game, src, params)

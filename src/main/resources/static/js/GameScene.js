@@ -1,12 +1,14 @@
 // 找不同场景
 // 找不同游戏数据
-function GameScene(game, datas) {
-    console.log(datas)
+function GameScene(game, params) {
+    this.map = new Map()
+    this.params = params
+    console.log(params)
     // 全部的游戏数据
-    this.datas = datas
+    this.datas = params.game.gameSceneDatas
     this.index = 0
     // 当前正在进行的游戏的数据
-    this.data = datas[this.index]
+    this.data = this.datas[this.index]
     if (this.data.structure === 'UP_AND_DOWN') {
         $(game.box).css(game.UD)
     } else {
@@ -58,7 +60,7 @@ GameScene.prototype.initGame = function (prevScene) {
     // this.label = new Label(this.game.box, this.data.fakeCnt || this.data.diffs.length)
 
     this.skipBtn.setOnClickListener(this.skip.bind(this))//this指向当前场景
-    this.confirmBtn.setOnClickListener(this.confirm.bind(this)) //this指向当前场景
+    this.confirmBtn.setOnClickListener(this.sendConfirmClick.bind(this)) //this指向当前场景
 
     // this.fullScreenBtn.show()
     this.skipBtn.show()
@@ -160,6 +162,8 @@ GameScene.prototype.connect = function () {
             } else if (msg.data.messageType === 'DATA') {
                 if (msg.data.data === 'next') {//跳过这一关
                     this.next()
+                } else if (msg.data.data === 'confirm') {//点击的是确定
+                    this.confirm()
                 } else {
                     //处理数据
                     this.processData(msg.data.data)
@@ -182,19 +186,19 @@ GameScene.prototype.connect = function () {
 /**
  * 处理坐标数据 （主要负责花圈）
  */
-GameScene.prototype.processData = function (diff) {
-    if (!diff)
+GameScene.prototype.processData = function (clickData) {
+    if (!clickData)
         return
-    console.log(diff)
+    console.log(clickData)
     let boxWidth = $(this.game.box).width();
     let boxHeight = $(this.game.box).height();
     if (this.data.structure === 'LEFT_AND_RIGHT') {//左右结构的图片
-        if (diff.x < boxWidth / 2) {
-            diff.x = diff.x + boxWidth / 2
+        if (clickData.x < boxWidth / 2) {
+            clickData.x = clickData.x + boxWidth / 2
         }
     } else {//上下结构的图片
-        if (diff.y < boxHeight / 2) {
-            diff.y = diff.y + boxHeight / 2
+        if (clickData.y < boxHeight / 2) {
+            clickData.y = clickData.y + boxHeight / 2
         }
     }
 
@@ -216,46 +220,47 @@ GameScene.prototype.processData = function (diff) {
 
     //直接画圆
     var flag = boxWidth > boxHeight
-    var left = diff.x - radius
-    var top = diff.y - radius
+    var left = clickData.x - radius
+    var top = clickData.y - radius
     var left_1
     var top_1
     if (flag) {
-        left_1 = diff.x - radius - boxWidth / 2
-        top_1 = diff.y - radius
+        left_1 = clickData.x - radius - boxWidth / 2
+        top_1 = clickData.y - radius
     } else {
-        left_1 = diff.x - radius
-        top_1 = diff.y - radius - boxHeight / 2
+        left_1 = clickData.x - radius
+        top_1 = clickData.y - radius - boxHeight / 2
     }
     //记录坐标，用于点击确定是判断是否点中用
-    this.x = diff.x
-    this.y = diff.y
+    this.x = clickData.x
+    this.y = clickData.y
 
     //当前点击正在显示的圆圈（为错误时擦除用）
-    this.diffDiv = this.differences.show(diff, left, top)
+    this.diffDiv = this.differences.show(clickData, left, top)
     //对称部分也同时画圈
-    this.diffDiv1 = this.differences.show(diff, left_1, top_1)
+    this.diffDiv1 = this.differences.show(clickData, left_1, top_1)
+
 
     //此时不在处理点击事件
     this.clickDisabled = true
     //点击确定的时候检查坐标
-    // if (this.differences.check(diff.x, diff.y)) {
+    // if (this.differences.check(clickData.x, clickData.y)) {
     //     record.start = false
     //     record.diffIndex = ++this.diffIndex
     //     record.hit = true
     //     //蓝底变色
     // } else {
     //     var flag = boxWidth > boxHeight
-    //     var errorLeft = diff.x - radius
-    //     var errorTop = diff.y - radius
+    //     var errorLeft = clickData.x - radius
+    //     var errorTop = clickData.y - radius
     //     var errorLeft_1
     //     var errorTop_1
     //     if (flag) {
-    //         errorLeft_1 = diff.x - radius - boxWidth / 2
-    //         errorTop_1 = diff.y - radius
+    //         errorLeft_1 = clickData.x - radius - boxWidth / 2
+    //         errorTop_1 = clickData.y - radius
     //     } else {
-    //         errorLeft_1 = diff.x - radius
-    //         errorTop_1 = diff.y - radius - boxHeight / 2
+    //         errorLeft_1 = clickData.x - radius
+    //         errorTop_1 = clickData.y - radius - boxHeight / 2
     //     }
     //
     //     this.differences.show(null, errorLeft, errorTop)
@@ -280,6 +285,7 @@ GameScene.prototype.clickListener = function (x, y) {
     if (!this.clickDisabled) {
         console.log('game scene click!')
         Scene.webSocket.send(JSON.stringify({
+            serialId: this.params.serial.id,
             x: x,
             y: y
         }))
@@ -316,12 +322,9 @@ GameScene.prototype.reset = function (start) {
 }
 
 /**
- * 点击确认时的方法
- * @param x 点击的坐标x
- * @param y 点击的坐标y
- * @returns {boolean}
+ * 发送确认按钮点击事件
  */
-GameScene.prototype.confirm = function () {
+GameScene.prototype.sendConfirmClick = function () {
     if (!this.diffDiv) {//进入下一关时，确保点击确定无反应
         floatDialog("请寻找不同处！")
     } else {
@@ -338,20 +341,28 @@ GameScene.prototype.confirm = function () {
             record.diffIndex = ++this.diffIndex
             record.hit = true
         }
-        this.clickDisabled = false;
         //重置坐标参数和上次点击的圆圈
         this.diffDiv = null
         this.diffDiv1 = null
         this.x = Number.MIN_VALUE
         this.y = Number.MIN_VALUE
-
-        //如果全部找出来 则进入下一关
-        if (this.data.diffsCoordinates.length === this.diffIndex)
-            setTimeout(() => {
-                this.next()
-            }, 350)
+        this.clickDisabled = false;
+        Scene.webSocket.send('confirm')
     }
     return false
+}
+/**
+ * 点击确认返回消息时的方法
+ * @param x 点击的坐标x
+ * @param y 点击的坐标y
+ * @returns {boolean}
+ */
+GameScene.prototype.confirm = function () {
+    //如果全部找出来 则进入下一关
+    if (this.data.diffsCoordinates.length === this.diffIndex)
+        setTimeout(() => {
+            this.next()
+        }, 250)
 }
 
 /**
@@ -366,7 +377,7 @@ var floatDialog = function (msg, delay) {
     d.show();
     setTimeout(function () {
         d.close().remove();
-    }, 500 || delay);
+    }, 250 || delay);
 }
 
 /**

@@ -3,6 +3,7 @@ package com.daem.finddiff.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.daem.finddiff.config.WebSocketEncoder;
 import com.daem.finddiff.dao.SerialDao;
+import com.daem.finddiff.dto.ClickData;
 import com.daem.finddiff.dto.Message;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.DiffsCoordinate;
@@ -60,7 +61,7 @@ public class GameWebsocketController {
         try {
             //推送房间中的数据
             if (!mutilPlay) {
-                broadcast(roomNum, session, true, Message.DATA(RoomService.getDiffsCoordinate(roomNum)));
+                broadcast(roomNum, session, true, Message.DATA(RoomService.getClickData(roomNum)));
             } else {//推送房间中的用户
                 broadcast(roomNum);
             }
@@ -127,12 +128,15 @@ public class GameWebsocketController {
                 sendStrMsg(roomNum, Message.DATA(message));
             } else if ("next".equals(message)) {
                 //下一关时清空当前关卡的数据
-                RoomService.putDiffsCoordinate(roomNum, null);
+                RoomService.putClickData(roomNum, null);
+                sendStrMsg(roomNum, Message.DATA(message));
+            } else if ("confirm".equals(message)) {
+                //发送确定事件点击的消息
                 sendStrMsg(roomNum, Message.DATA(message));
             } else {//广播坐标
-                DiffsCoordinate diffsCoordinate = JSONObject.parseObject(message, DiffsCoordinate.class);
-                putData(roomNum, diffsCoordinate);
-                broadcast(roomNum, session, Message.DATA(RoomService.getDiffsCoordinate(roomNum)));
+                ClickData clickData = JSONObject.parseObject(message, ClickData.class);
+                putData(roomNum, clickData);
+                broadcast(roomNum, session, Message.DATA(RoomService.getClickData(roomNum)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,8 +149,8 @@ public class GameWebsocketController {
      * @param roomNum
      * @return
      */
-    private static void putData(int roomNum, DiffsCoordinate data) {
-        RoomService.putDiffsCoordinate(roomNum, data);
+    private static void putData(int roomNum, ClickData data) {
+        RoomService.putClickData(roomNum, data);
     }
 
     /**

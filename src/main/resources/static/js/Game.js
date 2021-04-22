@@ -127,7 +127,7 @@ Game.prototype.loadGameScene = function (prevScene, params) {
         }).showModal()
         return
     }
-    var scene = new GameScene(this, params.game.gameSceneDatas)//游戏进行中的 传入场景数据
+    var scene = new GameScene(this, params)//游戏进行中的 传入场景数据
     scene.load(prevScene, params)
 }
 
