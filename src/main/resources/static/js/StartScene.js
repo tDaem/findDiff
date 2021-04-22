@@ -1,6 +1,6 @@
 // 开始场景
 function StartScene(game, src) {
-    src = src || 'images/start_bg.jpg'
+    src = src || 'images/login_bg.jpg'
     // 调用父类构造函数
     // 使用别人构造函数构造自己的对象
     Scene.call(this, game, src)
@@ -93,7 +93,7 @@ StartScene.prototype.soloGameBtnClick = function () {
             if (ret.code === 0 && ret.data) {
                 console.log('load next scene...')
                 this.params.roomNum = ret.data//保存房间号
-                changeSerialStatus(this.params.serial, 'IN_PROGRESS')
+                // changeSerialStatus(this.params.serial, 'IN_PROGRESS')
                 this.game.loadGameScene(this, this.params)
             } else {
                 floatDialog('进入游戏失败，请稍后重试！')
@@ -225,26 +225,6 @@ StartScene.prototype.processJoinRoom = function (preDialog) {
     return false
 }
 
-/**
- * 开始游戏后改变序列号的状态为已开始游戏
- * @param serialId
- */
-function changeSerialStatus(serial, status) {
-    console.log(serial)
-    $.ajax({
-        url: '/updateStatus?serialId=' + serial.id + "&serialStatus=" + status,
-        type: 'put',
-        dataType: 'json',
-        success: (res) => {
-            if (res.code > 0) {
-                floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
-            }
-        },
-        error: (ret) => {
-            floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
-        }
-    })
-}
 
 /**
  * 浮动的提醒消息 2秒后移除
@@ -305,7 +285,7 @@ StartScene.prototype.connect = function (showStartBtn) {
             } else if (msg.data.messageType === 'DATA') {
                 //处理数据
                 if (msg.data.data === 'startGame') {//开始游戏
-                    changeSerialStatus(this.params.serial, 'IN_PROGRESS')
+                    // changeSerialStatus(this.params.serial, 'IN_PROGRESS')
                     this.roomDialog.close().remove()
                     this.game.loadGameScene(this, this.params)
                 } else {//更新房间信息

@@ -111,11 +111,11 @@ public class SerialService {
     }
 
     @Transactional
-    public ResponseResult<Serial> updateSerialBySerialId(Integer serialId, SerialStatus serialStatus) {
+    public ResponseResult<Serial> updateSerialBySerialId(String serialNum, SerialStatus serialStatus) {
         try {
-            Serial one = serialDao.getOne(serialId);
-            one.setSerialStatus(serialStatus);
-            serialDao.save(one);
+            serialDao.updateSerialStatusBySerialNum(serialNum, serialStatus);
+//            one.setSerialStatus(serialStatus);
+//            serialDao.save(one);
             return ResponseResult.defSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

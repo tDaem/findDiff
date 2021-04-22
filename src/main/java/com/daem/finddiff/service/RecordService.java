@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,6 @@ public class RecordService {
 
                 Set<Integer> gameSceneDataIds = roomMap.get(roomNum).keySet();
                 List<Integer> sortedGameSceneDataIds = gameSceneDataIds.stream().sorted().collect(Collectors.toList());
-                boolean firstGameScene = true;//表示该游戏的第一张关卡，因为第一张关卡会多一条start=true的记录
                 for (int m = 0; m< sortedGameSceneDataIds.size(); m++ ) {//遍历关卡
                     Integer gameSceneDataId = sortedGameSceneDataIds.get(m);
                     List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);//获取房间中某关卡的所有记录
@@ -132,7 +132,9 @@ public class RecordService {
                         AtomicLong lastHitTime = new AtomicLong();//最后一次点击的时间
                         AtomicLong skipTime = new AtomicLong();//点击跳过按钮的时间
                         AtomicBoolean firstFlag = new AtomicBoolean(true);
+                        AtomicInteger n = new AtomicInteger();//除去开始和跳过的数
                         long num = recordsGroupByGameScene.stream().filter(record -> {
+                            if (record.isSkip() || record.isStart()) n.getAndIncrement();
                             boolean res = record.getDiffIndex() == recordsGroupByGameScene.get(recordsGroupByGameScene.size() - 1).getDiffIndex();//获取该关卡最后一次点击记录的索引（表示统计命中后到跳过点击的次数）
                             if (firstFlag.get() && res) {
                                 lastHitTime.set(record.getTime());
@@ -141,7 +143,7 @@ public class RecordService {
                             if (record.isSkip())//获取关卡跳过的时间
                                 skipTime.set(record.getTime());
                             return res;
-                        }).count() - 2;
+                        }).count() - n.get();
 //                        if (m == 0){//表示是当前游戏的第一张关卡
 //                            num = num - 2;//除去start=true的记录和跳过的记录
 //                        } else {

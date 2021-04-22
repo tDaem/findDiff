@@ -74,6 +74,7 @@ LoginScene.prototype.loginBtnClick = function () {
                     floatDialog('该游戏序号已被使用')
                     return
                 }
+                changeSerialStatus(serialNum, 'IN_PROGRESS')
                 this.game.loadStartScene(this,{
                     gameId: gameId,
                     serial: ret.data
@@ -112,6 +113,27 @@ LoginScene.prototype.loginBtnClick = function () {
             }
         }
     });
+}
+
+/**
+ * 开始游戏后改变序列号的状态为已开始游戏
+ * @param serialId
+ */
+function changeSerialStatus(serialNum, status) {
+    console.log(serial)
+    $.ajax({
+        url: '/updateStatus?serialNum=' + serialNum + "&serialStatus=" + status,
+        type: 'put',
+        dataType: 'json',
+        success: (res) => {
+            if (res.code > 0) {
+                floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
+            }
+        },
+        error: (ret) => {
+            floatDialog('与服务器通信失败，数据可能无法保存！请确认网络环境')
+        }
+    })
 }
 
 //

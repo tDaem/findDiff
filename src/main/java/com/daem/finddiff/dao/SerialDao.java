@@ -1,6 +1,7 @@
 package com.daem.finddiff.dao;
 
 import com.daem.finddiff.entity.Serial;
+import com.daem.finddiff.entity.SerialStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +45,8 @@ public interface SerialDao extends JpaRepository<Serial, Integer> {
     @Modifying
     @Query("update Serial s set s.serialStatus = 0")
     void resetSerialsState();
+
+    @Modifying
+    @Query("update Serial s set s.serialStatus = :serialStatus where s.serialNum = :serialNum")
+    void updateSerialStatusBySerialNum(String serialNum, SerialStatus serialStatus);
 }

@@ -162,8 +162,8 @@ GameScene.prototype.connect = function () {
             } else if (msg.data.messageType === 'DATA') {
                 if (msg.data.data === 'next') {//跳过这一关
                     this.next()
-                } else if (msg.data.data === 'confirm') {//点击的是确定
-                    this.confirm()
+                } else if (msg.data.data && msg.data.data.confirm) {//点击的是确定
+                    this.confirm(msg.data.data)
                 } else {
                     //处理数据
                     this.processData(msg.data.data)
@@ -202,22 +202,6 @@ GameScene.prototype.processData = function (clickData) {
         }
     }
 
-    //需要记录的数据
-    var record = {
-        roomNum: this.params.roomNum,
-        start: false,//是否开始游戏时
-        skip: false,//跳过
-        diffIndex: this.diffIndex,//第几处不同
-        gameSceneData: {//当前游戏场景
-            id: this.data.id
-        },
-        serial: {//当前游戏序列号
-            id: this.params.serial.id
-        },
-        time: new Date().getTime(),//当前操作的时间
-        hit: false//是否命中不同点
-    }
-
     //直接画圆
     var flag = boxWidth > boxHeight
     var left = clickData.x - radius
@@ -232,17 +216,23 @@ GameScene.prototype.processData = function (clickData) {
         top_1 = clickData.y - radius - boxHeight / 2
     }
     //记录坐标，用于点击确定是判断是否点中用
-    this.x = clickData.x
-    this.y = clickData.y
+    // this.x = clickData.x
+    // this.y = clickData.y
 
     //当前点击正在显示的圆圈（为错误时擦除用）
-    this.diffDiv = this.differences.show(clickData, left, top)
+    var diffDiv = this.differences.show(clickData, left, top)
     //对称部分也同时画圈
-    this.diffDiv1 = this.differences.show(clickData, left_1, top_1)
+    var diffDiv1 = this.differences.show(clickData, left_1, top_1)
 
+    this.map.set(clickData.serialId,
+        {
+            x: clickData.x,//点击的坐标
+            y: clickData.y,
+            diffDivs: [diffDiv, diffDiv1]//显示的圆圈
+        })
 
     //此时不在处理点击事件
-    this.clickDisabled = true
+    if (clickData.serialId === this.params.serial.id) this.clickDisabled = true
     //点击确定的时候检查坐标
     // if (this.differences.check(clickData.x, clickData.y)) {
     //     record.start = false
@@ -271,8 +261,6 @@ GameScene.prototype.processData = function (clickData) {
     //     record.start = false
     //     record.hit = false
     // }
-    this.records.push(record)
-    console.log(this.records)
     //
     // if (this.data.diffsCoordinates.length === this.diffIndex)
     //     setTimeout(() => {
@@ -283,6 +271,21 @@ GameScene.prototype.processData = function (clickData) {
 // 重写点击监听函数（记录数据）
 GameScene.prototype.clickListener = function (x, y) {
     if (!this.clickDisabled) {
+        //需要记录的数据
+        this.record = {
+            roomNum: this.params.roomNum,
+            start: false,//是否开始游戏时
+            skip: false,//跳过
+            diffIndex: this.diffIndex,//第几处不同
+            gameSceneData: {//当前游戏场景
+                id: this.data.id
+            },
+            serial: {//当前游戏序列号
+                id: this.params.serial.id
+            },
+            time: new Date().getTime(),//当前操作的时间
+            hit: false//是否命中不同点
+        }
         console.log('game scene click!')
         Scene.webSocket.send(JSON.stringify({
             serialId: this.params.serial.id,
@@ -325,29 +328,16 @@ GameScene.prototype.reset = function (start) {
  * 发送确认按钮点击事件
  */
 GameScene.prototype.sendConfirmClick = function () {
-    if (!this.diffDiv) {//进入下一关时，确保点击确定无反应
+    let diffData = this.map.get(this.params.serial.id);//点击的数据（坐标+圆圈）
+    if (!diffData) {//进入下一关时，确保点击确定无反应
         floatDialog("请寻找不同处！")
     } else {
-        var record = this.records[this.records.length - 1]
-        var hit = this.differences.check(this.x, this.y);
-        if (!hit) {//没有命中  移除圆圈，并记录数据
-            this.diffDiv.remove()
-            this.diffDiv1.remove()
-            //记录数据
-            record.start = false
-            record.hit = false
-        } else {
-            record.start = false
-            record.diffIndex = ++this.diffIndex
-            record.hit = true
-        }
-        //重置坐标参数和上次点击的圆圈
-        this.diffDiv = null
-        this.diffDiv1 = null
-        this.x = Number.MIN_VALUE
-        this.y = Number.MIN_VALUE
-        this.clickDisabled = false;
-        Scene.webSocket.send('confirm')
+        var hit = this.differences.check(diffData.x, diffData.y);
+        Scene.webSocket.send(JSON.stringify({
+            confirm: 'confirm',//发送点击了确定按钮
+            serialId: this.params.serial.id,//哪个玩家
+            hit: hit//是否命中
+        }))
     }
     return false
 }
@@ -357,7 +347,26 @@ GameScene.prototype.sendConfirmClick = function () {
  * @param y 点击的坐标y
  * @returns {boolean}
  */
-GameScene.prototype.confirm = function () {
+GameScene.prototype.confirm = function (data) {
+
+    var serialId = data.serialId
+    var hit = data.hit
+    if (!hit) {
+        let diffData = this.map.get(serialId)
+        diffData.diffDivs[0].remove()
+        diffData.diffDivs[1].remove()
+    } else {
+        ++this.diffIndex //命中索引+1
+    }
+    if (this.params.serial.id === serialId) {
+        this.record.diffIndex = this.diffIndex
+        this.record.start = false
+        this.record.hit = hit
+        this.records.push(this.record)//如果是自己点击的
+    }
+    this.map.delete(serialId)
+
+    if (serialId === this.params.serial.id) this.clickDisabled = false;
     //如果全部找出来 则进入下一关
     if (this.data.diffsCoordinates.length === this.diffIndex)
         setTimeout(() => {
@@ -384,10 +393,10 @@ var floatDialog = function (msg, delay) {
  * 点击跳过按钮时执行的方法
  */
 GameScene.prototype.skip = function () {
-    if (this.clickDisabled) {
+    if (this.clickDisabled || this.map.size > 0) {
         //提示 你已经点击了一处，但没有点击确定！
-        console.log("你已经点击了一处，但没有点击确定！")
-        floatDialog("你已经点击了一处，但没有点击确定！")
+        console.log("你已经点击了一处，但还没有点击确定！")
+        floatDialog("已经点击了一处，但还没有点击确定！")
     } else {
         var option = {
             title: '温馨提示',

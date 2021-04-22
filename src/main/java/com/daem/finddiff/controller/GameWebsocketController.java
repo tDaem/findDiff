@@ -130,9 +130,9 @@ public class GameWebsocketController {
                 //下一关时清空当前关卡的数据
                 RoomService.putClickData(roomNum, null);
                 sendStrMsg(roomNum, Message.DATA(message));
-            } else if ("confirm".equals(message)) {
+            } else if ("confirm".equals(JSONObject.parseObject(message).getString("confirm"))) {
                 //发送确定事件点击的消息
-                sendStrMsg(roomNum, Message.DATA(message));
+                sendStrMsg(roomNum, Message.DATA(JSONObject.parseObject(message)));
             } else {//广播坐标
                 ClickData clickData = JSONObject.parseObject(message, ClickData.class);
                 putData(roomNum, clickData);

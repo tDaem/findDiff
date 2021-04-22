@@ -1,4 +1,4 @@
-const delayTime = 1000
+const delayTime = 150
 const radius = 30
 
 const boxW = '800px'

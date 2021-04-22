@@ -66,7 +66,7 @@ public class SerialController {
      * 更新序列号实例
      *
      * @param serial 需要更新的序列号实例
-     * @return 如果删除成功，泛型中返回true，否则false
+     * @return
      */
     @PutMapping(value = "/serial", produces = "application/json;charset=UTF-8")
     public ResponseResult<Serial> updateSerial(@RequestBody Serial serial) {
@@ -79,8 +79,8 @@ public class SerialController {
     }
 
     @PutMapping(value = "/updateStatus")
-    public ResponseResult<Serial> updateSerialStatus(Integer serialId, SerialStatus serialStatus) {
-        return serialService.updateSerialBySerialId(serialId, serialStatus);
+    public ResponseResult<Serial> updateSerialStatus(String serialNum, SerialStatus serialStatus) {
+        return serialService.updateSerialBySerialId(serialNum, serialStatus);
     }
 
     @GetMapping(value = "/resetSerials")
