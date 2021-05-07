@@ -75,8 +75,13 @@ LoginScene.prototype.loginBtnClick = function () {
                     return
                 }
                 changeSerialStatus(serialNum, 'IN_PROGRESS')
-                this.game.loadStartScene(this,{
-                    gameId: gameId,
+                // this.game.loadStartScene(this,{
+                //     gameId: gameId,
+                //     serial: ret.data
+                // })
+
+                this.game.loadRuleScene(this,{
+                    gameId: gameId, //游戏昵称
                     serial: ret.data
                 })
 
@@ -146,7 +151,8 @@ LoginScene.prototype.load = function (prevScene) {
         bottom: '0px',
         display: 'inline-block',
         padding: '8px',
-        borderRadius: '6px'
+        borderRadius: '6px',
+        gameDescription: this.params.gameDescription
     })
 
     this.loginView.show()

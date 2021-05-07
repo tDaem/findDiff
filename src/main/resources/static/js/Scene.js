@@ -1,9 +1,10 @@
 // 表示游戏场景
 // game表示游戏对象
 // img表示场景使用的图片
-function Scene(game, img) {
+function Scene(game, img, params) {
     this.game = game
     this.img = img
+    this.params = params
 }
 
 

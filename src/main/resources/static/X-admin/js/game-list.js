@@ -37,6 +37,7 @@ function initTable(form) {
                     '                                <input type="checkbox" name="id" value="' + v.id + '" lay-skin="primary">' +
                     '                            </td>' +
                     '                            <td>' + v.gameName + '</td>' +
+                    '                            <td>' + (v.test ? '是' : '否') + '</td>' +
                     '                            <td class="td-manage">' +
                     '                                <a title="编辑" onclick="xadmin.open(\'编辑\',\'game-edit.html?gameId=' + v.id + '\',600,400)"' +
                     '                                   href="javascript:;">' +

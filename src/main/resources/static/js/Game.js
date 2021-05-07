@@ -1,14 +1,15 @@
 // 整体游戏控制
-function Game(box) {//初始化 将图片添加到main中 播放音乐 添加监听
+function Game(box, options) {//初始化 将图片添加到main中 播放音乐 添加监听
     this.box = box
+    this.options = options
     // 创建音效对象，播放背景音乐
     this.audio = new Audio()
-    this.audio.playMusic(true)
+    // this.audio.playMusic(true)
 
     // 监听点击事件
     this.listen()
     // 加载登录场景
-    this.loadLoginScene()
+    this.loadLoginScene(options)
     console.log(this);
 }
 
@@ -53,7 +54,7 @@ Game.prototype.listen = function () {//获取点击的在盒子上的坐标（�
 
 Game.prototype.loadLoginScene = function (params) {//
     $(this.box).css(this.LR)
-    var scene = new LoginScene(this, params)//登录场景
+    var scene = new LoginScene(this, null, params)//登录场景
     scene.load()
 }
 
@@ -113,9 +114,38 @@ Game.prototype.loadStartScene = function (prevScene, params) {//
 
 }
 
+/**
+ * 加载规则页面
+ * @param prevScene
+ * @param params
+ */
+Game.prototype.loadRuleScene = function (prevScene, params) {
+    console.log(params)
+    $.ajax({//获取游戏规则
+        url: "/game-test",
+        type: 'get',
+        timeout: 12000,
+        dataType: 'json',
+        beforeSend: function () {
+            this.layerIndex = layer.load(0, {shade: [0.5, '#393D49']});
+        },
+        success: ret => {
+            console.log("ret:", ret)
+            if (ret.code > 0){
+                return layer.msg('加载游戏失败！', {icon: 5});//失败的表情
+            }
+            //保存试玩关卡
+        },
+        complete: function () {
+            layer.close(this.layerIndex);
+        },
+    });
+}
+
+
 //加载下一张图片
 Game.prototype.loadGameScene = function (prevScene, params) {
-    console.log(params)
+    console.log('params', params)
     if (params.game && params.game.gameSceneDatas.length === 0) {
         dialog({
             title: "温馨提示",

@@ -28,7 +28,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
 
                 $.each(ret.data, function (inx, item) {
                     selectHtml +=
-                                    '<option value="' + item.id + '">' + item.gameSceneName + '</option>'
+                        '<option value="' + item.id + '">' + item.gameSceneName + '</option>'
                 })
                 selectHtml +=
                     '           </select>' +
@@ -61,6 +61,7 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
                             // form.render()
                             $('select').eq(ind).find('option[value=' + item.id + ']').attr("selected", true)
                         })
+                        $('#test').attr('checked', res.data.test)
                         form.render()
                     },
                     error: (res) => {
@@ -83,17 +84,17 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
         })
 
         //form.render('select');
-        form.on('select(select)', function(data){
+        form.on('select(select)', function (data) {
             console.log(data)
             let selects = $('select option:selected')
-            if (data.value){
+            if (data.value) {
                 var cnt = 0
                 selects.each(function (index) {
                     if ($(selects[index]).val() == data.value)
-                        cnt ++
+                        cnt++
                 })
-                if (cnt != 1){
-                    $(data.elem).find("option[value='']").prop("selected",true);
+                if (cnt != 1) {
+                    $(data.elem).find("option[value='']").prop("selected", true);
                     form.render('select')
                     layer.msg('该关卡已在游戏中存在！')
                 }
@@ -145,6 +146,7 @@ function generateGameJson() {
     let gameScenes = []
     game.id = getQueryVariable('gameId')
     game.gameName = $('#gameName').val()
+    game.test = $('#test').prop('checked') == true
     selects.each(function (i) {
         gameScenes.push({
             id: $(selects[i]).val()
