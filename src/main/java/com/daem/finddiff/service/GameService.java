@@ -37,13 +37,13 @@ public class GameService {
     private GameSceneDataDao gameSceneDataDao;
 
 
+    @Transactional
     public ResponseResult<Game> saveGame(Game game) {
-        try {
-            Game game1 = gameDao.save(game);
-            return ResponseResult.defSuccessful(game1);
-        } catch (Exception e) {
-            return ResponseResult.defFailed("数据异常！", e.getMessage());
+        if (game.isTest()) {//确保只有一个只玩游戏
+            gameDao.setAllGamesNotTest();
         }
+        Game game1 = gameDao.save(game);
+        return ResponseResult.defSuccessful(game1);
     }
 
     /**
@@ -108,7 +108,7 @@ public class GameService {
 
     public ResponseResult<List<Game>> getGames() {
         try {
-            List<Game> all = gameDao.findAll();
+            List<Game> all = gameDao.getGamesNoTest();
             return ResponseResult.defSuccessful(all);
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());
@@ -117,12 +117,13 @@ public class GameService {
 
     @Transactional
     public ResponseResult<Boolean> delGames(Integer[] ids) {
-        try {
-            serialDao.updateByIds(ids);
-            gameDao.delAllByIds(ids);
-            return ResponseResult.defSuccessful();
-        } catch (Exception e) {
-            return ResponseResult.defFailed("数据异常！", e.getMessage());
-        }
+        serialDao.updateByIds(ids);
+        gameDao.delAllByIds(ids);
+        return ResponseResult.defSuccessful();
+
+    }
+
+    public ResponseResult<Game> getTestGame() {
+        return ResponseResult.defSuccessful(gameDao.getGameByTest(true));
     }
 }

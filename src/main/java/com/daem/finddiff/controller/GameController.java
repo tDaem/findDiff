@@ -73,4 +73,14 @@ public class GameController {
     public ResponseResult<Game> updateGame(@RequestBody Game game) {
         return gameService.updateGame(game);
     }
+
+
+    /**
+     * 获取测试关卡
+     * @return
+     */
+    @GetMapping("/game-test")
+    public ResponseResult<Game> getTestGame(){
+        return gameService.getTestGame();
+    }
 }

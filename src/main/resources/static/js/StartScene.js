@@ -66,7 +66,8 @@ StartScene.prototype.load = function (prevScene, params) {
     Scene.prototype.load.call(this)
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
-    prevScene.loginView.remove()
+    if (prevScene instanceof RuleScene)
+        prevScene.ruleView.remove()
     prevScene.$ele.fadeOut(delayTime, () => {
             console.log('start scene loaded')
             prevScene.unload()

@@ -19,7 +19,7 @@ LoginView.prototype.show = function () {
     var html =
         '    <!--放置视频，或者文字-->' +
         '    <div class="float-left">' +
-        '        <p>' + (this.options.gameDescription.loginDescription || '您好!欢迎您参与本次游戏，为了确保本次游戏顺利进行，接下来请在右侧登录框中按要求填写信息;登录之后，请结合文字和视频，认真听清游戏规则,如果没有明白规则，请举手示意，请务必确保清楚游戏规则后再开始。') + '</p>' +
+        '        <p>' + (this.options.gameDescription.loginDescription || '未配置登录页描述！') + '</p>' +
         '    </div>' +
         '    <div class="float-right">' +
         '        <form>' +

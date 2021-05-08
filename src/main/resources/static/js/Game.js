@@ -76,6 +76,7 @@ Game.prototype.loadStartScene = function (prevScene, params) {//
                 //存在该序列号时进入相应的游戏
                 console.log(ret.data)
                 params.game = ret.data//游戏及关卡数据
+                console.log('params', params)
                 var scene = new StartScene(this)
                 scene.load(prevScene, params)
             } else {
@@ -120,8 +121,8 @@ Game.prototype.loadStartScene = function (prevScene, params) {//
  * @param params
  */
 Game.prototype.loadRuleScene = function (prevScene, params) {
-    console.log(params)
-    $.ajax({//获取游戏规则
+    console.log('loadRuleScene', params)
+    $.ajax({//获取试玩
         url: "/game-test",
         type: 'get',
         timeout: 12000,
@@ -130,23 +131,26 @@ Game.prototype.loadRuleScene = function (prevScene, params) {
             this.layerIndex = layer.load(0, {shade: [0.5, '#393D49']});
         },
         success: ret => {
-            console.log("ret:", ret)
+            console.log("loadRuleScene:", ret)
             if (ret.code > 0){
                 return layer.msg('加载游戏失败！', {icon: 5});//失败的表情
             }
             //保存试玩关卡
+            params.testGame = ret.data
         },
         complete: function () {
             layer.close(this.layerIndex);
         },
     });
+    var scene = new RuleScene(this, null, params)//游戏进行中的 传入场景数据
+    scene.load(prevScene, params)
 }
 
 
 //加载下一张图片
 Game.prototype.loadGameScene = function (prevScene, params) {
     console.log('params', params)
-    if (params.game && params.game.gameSceneDatas.length === 0) {
+    if (!params.test && params.game && params.game.gameSceneDatas.length === 0) {
         dialog({
             title: "温馨提示",
             content: "游戏配置错误，请联系管理员！",

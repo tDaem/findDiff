@@ -79,11 +79,9 @@ LoginScene.prototype.loginBtnClick = function () {
                 //     gameId: gameId,
                 //     serial: ret.data
                 // })
-
-                this.game.loadRuleScene(this,{
-                    gameId: gameId, //游戏昵称
-                    serial: ret.data
-                })
+                this.params.gameId = gameId //游戏昵称
+                this.params.serial = ret.data
+                this.game.loadRuleScene(this,this.params)
 
             } else {
                 //序列号输入错误时 弹出提示

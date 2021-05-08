@@ -59,6 +59,18 @@ layui.use(['form', 'layer', 'upload', 'jquery'],
             form.render()
         })
 
+        //监听多选框点击事件  主要是通过 lay-filter="switchTest"  来监听
+        form.on('checkbox(switchTest)', function (data) {
+            console.log( data );　　//打印当前选择的信息
+            if( data.elem.checked){　　　　　　//判断当前多选框是选中还是取消选中
+                layer.confirm("试玩游戏只有一个，如果配置此游戏为试玩游戏，若已配置其他试玩游戏将取消其他游戏为试玩游戏！",{
+                    btn: ['确认']
+                }, function (index) {
+                    layer.close(index)
+                });
+            }
+        });
+
         //监听提交
         form.on('submit(add)',
             function (data) {
@@ -108,6 +120,7 @@ function generateGameJson() {
     let game = {}; //声明一个对象
     let gameScenes = []
     game.gameName = $('#gameName').val()
+    game.test = $('#test').prop('checked') == true
     selects.each(function (i) {
         gameScenes.push({
             id: $(selects[i]).val()

@@ -144,11 +144,6 @@ public class RecordService {
                                 skipTime.set(record.getTime());
                             return res;
                         }).count() - n.get();
-//                        if (m == 0){//表示是当前游戏的第一张关卡
-//                            num = num - 2;//除去start=true的记录和跳过的记录
-//                        } else {
-//                            num = num - 1;//除去跳过的记录
-//                        }
                         tBodyMap.put("lastToSkipHitNum", String.valueOf(num));
                         tBodyMap.put("lastToSkipHitTime", String.format("%.3f", (skipTime.get() - lastHitTime.get()) / 1000.0));
                     }

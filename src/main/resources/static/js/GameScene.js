@@ -5,7 +5,11 @@ function GameScene(game, params) {
     this.params = params
     console.log(params)
     // 全部的游戏数据
-    this.datas = params.game.gameSceneDatas
+    if (params.test) { //加载正式游戏关卡
+        this.datas = params.testGame.gameSceneDatas
+    } else {//加载试玩游戏关卡
+        this.datas = params.game.gameSceneDatas
+    }
     this.index = 0
     // 当前正在进行的游戏的数据
     this.data = this.datas[this.index]
@@ -36,6 +40,7 @@ function GameScene(game, params) {
      */
     this.records = []
     Scene.call(this, game, this.data.imgPath)
+    console.log('map', this.map)
 }
 
 
@@ -96,8 +101,12 @@ GameScene.prototype.initGame = function (prevScene) {
 
     // 将上一个场景淡出，动画结束后将上一个场景卸载
     // 同时开始倒计时
-    prevScene.soloGameBtn.remove()
-    prevScene.teamGameBtn.remove()
+    if (!this.params.test) {
+        prevScene.soloGameBtn.remove()
+        prevScene.teamGameBtn.remove()
+    } else {
+        prevScene.ruleView.remove()
+    }
     // prevScene.fullScreen.remove()
     prevScene.$ele.fadeOut(delayTime, () => {
         console.log('game scene loaded')
@@ -231,6 +240,7 @@ GameScene.prototype.processData = function (clickData) {
             diffDivs: [diffDiv, diffDiv1]//显示的圆圈
         })
 
+    console.log(this.map)
     //此时不在处理点击事件
     if (clickData.serialId === this.params.serial.id) this.clickDisabled = true
     //点击确定的时候检查坐标
@@ -328,7 +338,8 @@ GameScene.prototype.reset = function (start) {
  * 发送确认按钮点击事件
  */
 GameScene.prototype.sendConfirmClick = function () {
-    let diffData = this.map.get(this.params.serial.id);//点击的数据（坐标+圆圈）
+    console.log('map', this.map)
+    var diffData = this.map.get(this.params.serial.id);//点击的数据（坐标+圆圈）
     if (!diffData) {//进入下一关时，确保点击确定无反应
         floatDialog("请寻找不同处！")
     } else {
@@ -496,7 +507,17 @@ GameScene.prototype.next = function () {
         })
     } else {
         this.differences.reset()
-        this.game.complete()
+        if (this.params.test) {
+            layer.msg('试玩结束')
+            setTimeout(() => {
+                this.params.test = false
+                Scene.webSocket = null
+                this.game.loadStartScene(this, this.params)
+            }, 500)
+        } else {
+            this.game.complete()
+        }
+
     }
 }
 
@@ -510,9 +531,17 @@ GameScene.prototype.pass = function (label, preview) {
         if (this.index < this.datas.length - 1) {
             this.game.audio.playPass()
         } else {
-            this.game.audio.playComplete()
+            if (this.params.test) {
+                layer.msg('试玩结束')
+                setTimeout(() => {
+                    this.params.test = false
+                    Scene.webSocket = null
+                    this.game.loadStartScene(this, this.params)
+                }, 500)
+            } else {
+                this.game.audio.playComplete()
+            }
         }
-
         return;
     }
 
@@ -524,7 +553,8 @@ GameScene.prototype.pass = function (label, preview) {
  * 保存记录到后台
  * @param records
  */
-GameScene.prototype.saveRecord = (records) => {
+GameScene.prototype.saveRecord = function (records) {
+    if (this.params.test) return //如果是试玩游戏  放弃保存数据
     console.log(JSON.stringify(records))
     $.ajax({
         url: "/record",

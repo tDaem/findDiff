@@ -26,6 +26,7 @@ function initTable(form) {
                     '                            </td>' +
                     '                            <td>' + v.serialNum + '</td>' +
                     '                            <td>' + (v.game ? v.game.gameName : '') + '</td>' +
+                    '                            <td>' + (v.serialStatus === 'NOT_STARTED' ? '未使用' : '已使用') + '</td>' +
                     '                            <td class="td-manage">' +
                     '                                <a title="编辑" onclick="xadmin.open(\'编辑\',\'serial-edit.html?serialId=' + v.id + '\',600,400)"' +
                     '                                   href="javascript:;">' +
@@ -189,6 +190,7 @@ function resetSerial() {
                 if (res.code > 0)
                     return layer.msg('操作失败！', {icon: 2});
                 layer.msg('重置成功', {icon: 1});
+                location.reload()
             }
         })
     });
