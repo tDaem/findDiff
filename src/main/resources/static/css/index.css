@@ -18,7 +18,21 @@ form > table tr td > * {
     max-width: 400px;
     position: relative;
     top: 38%;
-    transform: translateY(-50%);
+    transform: translateY(-39%);
+    overflow: auto;
+    max-height: 100%;
+}
+
+#info > *::-webkit-scrollbar {
+    display:none
+}
+
+.hiddenScrollBar {
+
+}
+
+.hiddenScrollBar::-webkit-scrollbar {
+    display:none
 }
 
 div.float-left > p {

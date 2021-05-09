@@ -18,10 +18,10 @@ RuleView.prototype.show = function () {
 
     var html =
         '    <!--放置视频，或者文字-->' +
-        '    <div style="margin: 8px;width: 100%;height: 75%;overflow: auto">' +
-                (this.options.gameDescription.gameRule || '请配置游戏规则！') +
+        '    <div style="margin: 8px;width: 70%;height: 75%;overflow: auto">' +
+                (this.options.gameDescription.gameRule || '未配置游戏规则！') +
         '    </div>' +
-        '    <div style="margin-top: 40px;text-align: center">' +
+        '    <div style="margin-top: 40px;text-align: center;width: 70%;">' +
         '       <button id="knowBtn" type="button" class="btn btn-success">已了解</button>' +
         '       <button id="unknowBtn" type="button" class="btn btn-info">不了解？试玩</button>' +
         '    </div>'

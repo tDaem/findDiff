@@ -18,7 +18,7 @@ LoginView.prototype.show = function () {
 
     var html =
         '    <!--放置视频，或者文字-->' +
-        '    <div class="float-left">' +
+        '    <div class="float-left"; style="">' +
         '        <p>' + (this.options.gameDescription.loginDescription || '未配置登录页描述！') + '</p>' +
         '    </div>' +
         '    <div class="float-right">' +
