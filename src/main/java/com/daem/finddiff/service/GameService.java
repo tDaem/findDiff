@@ -106,9 +106,14 @@ public class GameService {
         }
     }
 
-    public ResponseResult<List<Game>> getGames() {
+    public ResponseResult<List<Game>> getGames(boolean containTest) {
         try {
-            List<Game> all = gameDao.getGamesNoTest();
+            List<Game> all;
+            if (containTest) {
+                all = gameDao.findAll();
+            } else {
+                all = gameDao.getGamesNoTest();
+            }
             return ResponseResult.defSuccessful(all);
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());

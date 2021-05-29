@@ -1,5 +1,5 @@
 const delayTime = 150
-const radius = 30
+const radius = 50
 
 const boxW = '800px'
 const boxH = '502px'

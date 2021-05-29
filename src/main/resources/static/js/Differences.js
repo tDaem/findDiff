@@ -19,11 +19,11 @@ Differences.prototype.check = function (x, y, noDraw) {
         // 如果“不同”已经画在页面上，则跳过下面的代码，
         // 继续循环下一个不同！
 
-        // 计算“不同”区域
-        var left = diff.x - radius
-        var right = diff.x + radius
-        var top = diff.y - radius
-        var bottom = diff.y + radius
+        // 计算“不同”区域  除以二的目的确保圆圈包含检测圆
+        var left = diff.x - radius/3
+        var right = diff.x + radius/3
+        var top = diff.y - radius/3
+        var bottom = diff.y + radius/3
 
         if (x > left && x < right && y > top && y < bottom) {
             if (!noDraw){

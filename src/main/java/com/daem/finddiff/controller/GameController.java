@@ -42,8 +42,8 @@ public class GameController {
     }
 
     @GetMapping(value = "/games")
-    public ResponseResult<List<Game>> getGames() {
-        return gameService.getGames();
+    public ResponseResult<List<Game>> getGames(boolean containTest) {
+        return gameService.getGames(containTest);
     }
 
     /**

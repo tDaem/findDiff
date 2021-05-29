@@ -98,7 +98,7 @@ function bindGames() {
             if (ret.code > 0)
                 return layer.msg('获取游戏列表失败', {icon: 0})
             if (ret.data.length === 0)
-                layer.msg("还没有游戏，请先新增游戏", {icon: 0})
+                layer.msg("还没有正式游戏，请先新增游戏", {icon: 0})
 
             selectHtml = '<div>' +
                 '   <div class="layui-inline">' +

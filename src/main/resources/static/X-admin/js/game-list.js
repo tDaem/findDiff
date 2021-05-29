@@ -22,7 +22,7 @@ layui.use(['laydate', 'form', 'jquery'], function () {
 
 function initTable(form) {
     $.ajax({
-        url: '/games',
+        url: '/games?containTest=true',
         type: 'get',
         dataType: 'json',
         success: (res) => {
