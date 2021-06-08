@@ -14,7 +14,8 @@ function View(box, options) {
         backgroundColor: '#ffcc01',
         display: 'inline-block',
         padding: '8px',
-        borderRadius: '6px'
+        borderRadius: '6px',
+        zIndex: 9999    //视图置于最上层
     }, options)
 }
 

@@ -27,6 +27,10 @@ form > table tr td > * {
     display:none
 }
 
+#rule > *::-webkit-scrollbar {
+    display:none
+}
+
 .hiddenScrollBar {
 
 }
