@@ -33,5 +33,5 @@ public interface RecordDao extends JpaRepository<Record, Integer> {
 
     void deleteAllBySerial_Game_Id(Integer gameId);
 
-    List<Record> findAllByRoomNum(Integer roomNum);
+    List<Record> findAllByRoomNumOrderByTime(Integer roomNum);
 }

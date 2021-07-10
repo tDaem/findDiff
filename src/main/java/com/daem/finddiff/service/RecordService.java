@@ -74,10 +74,10 @@ public class RecordService {
             List<String> players = new ArrayList<>();
 
             for (Integer roomNum : roomMap.keySet()) {//遍历房间
-                List<Record> recordsByRoomNum = recordDao.findAllByRoomNum(roomNum);
+                //获取房间中的记录  并根据时间正序排序
+                List<Record> recordsByRoomNum = recordDao.findAllByRoomNumOrderByTime(roomNum);
                 players.clear();
-                for (int i = 0; i < recordsByRoomNum.size(); i++) {//该房间中的玩家
-                    Record record = recordsByRoomNum.get(i);
+                for (Record record : recordsByRoomNum) {//该房间中的玩家
                     if (!players.contains(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")")) {
                         players.add(record.getSerial().getSerialNum() + "(" + record.getSerial().getUserName() + ")");
                     }
@@ -85,8 +85,7 @@ public class RecordService {
 
                 Set<Integer> gameSceneDataIds = roomMap.get(roomNum).keySet();
                 List<Integer> sortedGameSceneDataIds = gameSceneDataIds.stream().sorted().collect(Collectors.toList());
-                for (int m = 0; m< sortedGameSceneDataIds.size(); m++ ) {//遍历关卡
-                    Integer gameSceneDataId = sortedGameSceneDataIds.get(m);
+                for (Integer gameSceneDataId : sortedGameSceneDataIds) {//遍历关卡
                     List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);//获取房间中某关卡的所有记录
                     Map<String, String> tBodyMap = new LinkedHashMap<>();
                     tBodyMap.put("roomNum", roomNum.toString());
