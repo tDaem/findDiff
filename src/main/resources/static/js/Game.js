@@ -172,6 +172,6 @@ Game.prototype.complete = function (params) {
     } else {
         $(this.box).css(this.LR)
     }
-    var scene = new CompleteScene(this)
-    scene.load(true, params)
+    var completeScene = new CompleteScene(this)
+    completeScene.load(true, params)
 }

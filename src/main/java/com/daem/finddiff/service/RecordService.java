@@ -1,10 +1,12 @@
 package com.daem.finddiff.service;
 
+import com.daem.finddiff.dao.GameDao;
 import com.daem.finddiff.dao.GameSceneDataDao;
 import com.daem.finddiff.dao.RecordDao;
 import com.daem.finddiff.dto.ResponseResult;
 import com.daem.finddiff.entity.GameSceneData;
 import com.daem.finddiff.entity.Record;
+import org.aspectj.lang.annotation.Around;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,9 @@ public class RecordService {
 
     @Autowired
     private GameSceneDataDao gameSceneDataDao;
+
+    @Autowired
+    private GameDao gameDao;
 
     public ResponseResult<Integer> saveRecord(List<Record> records) {
         try {
@@ -83,8 +88,8 @@ public class RecordService {
                     }
                 }
 
-                Set<Integer> gameSceneDataIds = roomMap.get(roomNum).keySet();
-                List<Integer> sortedGameSceneDataIds = gameSceneDataIds.stream().sorted().collect(Collectors.toList());
+                //关卡  P排序过的
+                List<Integer> sortedGameSceneDataIds = gameSceneDataDao.getAllByGameId(gameId).stream().map(GameSceneData::getId).collect(Collectors.toList());
                 for (Integer gameSceneDataId : sortedGameSceneDataIds) {//遍历关卡
                     List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);//获取房间中某关卡的所有记录
                     Map<String, String> tBodyMap = new LinkedHashMap<>();

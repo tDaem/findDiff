@@ -62,7 +62,7 @@ GameScene.prototype.initGame = function (prevScene) {
 
     this.confirmBtn = new ConfirmButton(this.game.box, {})
     // this.secondManager = new SecondManager(this.game.box, this.data.seconds)
-    // this.label = new Label(this.game.box, this.data.fakeCnt || this.data.diffs.length)
+    this.label = new Label(this.game.box, 0, {})
 
     this.skipBtn.setOnClickListener(this.skip.bind(this))//this指向当前场景
     this.confirmBtn.setOnClickListener(this.sendConfirmClick.bind(this)) //this指向当前场景
@@ -70,6 +70,7 @@ GameScene.prototype.initGame = function (prevScene) {
     // this.fullScreenBtn.show()
     this.skipBtn.show()
     this.confirmBtn.show()
+    this.label.show()
     if (this.data.structure === 'UP_AND_DOWN') {
         $(this.game.box).css(this.game.UD)
         console.log(this.skipBtn)
@@ -368,6 +369,7 @@ GameScene.prototype.confirm = function (data) {
         diffData.diffDivs[1].remove()
     } else {
         ++this.diffIndex //命中索引+1
+        this.label.increaseCnt()//找出不同数+1
     }
     if (this.params.serial.id === serialId) {
         this.record.diffIndex = this.diffIndex
@@ -515,7 +517,8 @@ GameScene.prototype.next = function () {
                 this.game.loadStartScene(this, this.params)
             }, 500)
         } else {
-            this.game.complete()
+            this.params.findCnt = this.label.cnt
+            this.game.complete(this.params)
         }
 
     }

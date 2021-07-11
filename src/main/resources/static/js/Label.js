@@ -1,50 +1,30 @@
-// 表示“还有X次不同”中的数字
-function Label(box, total, options){
+// 总共找出了多少正确的不同
+function Label(box, options){
     this.box = box
-    // 总共有几处不同，即初始值
-    this.total = total
-    // 还剩几处不同，即当前值
-    this.value = this.total
+
+    this.cnt = 0
     
     this.options = {
         position: 'absolute',
-        left: '556px',
-        bottom: '23px',
-        fontSize: '32px',
+        left: '300px',
+        bottom: '502px',
+        fontSize: '20px',
         display: 'inline-block',
-        color: 'white'
+        color: 'white',
+        backgroundColor: 'rgb(91, 192, 222)'
     }
+    View.call(this, box, this.options)
 }
+
+Label.prototype = Object.create(View.prototype)
+Label.prototype.constructor = Label
 
 // 把数字显示到页面上
 Label.prototype.show = function(){
-    this.$ele = $('<span>').text(this.value).css(this.options).prependTo(this.box)
+    this.$ele = $('<span>').html('累计已找出 <b style="color: rgb(94,43,170); font-size: 26px"> ' + this.cnt + ' </b> 处不同！').css(this.options).prependTo(this.box)
 }
 
-// 重新设置初始值和值变成0时的回调函数
-Label.prototype.set = function(complete, total){
-    this.complete = complete
-    
-    this.total = total || 5
-    this.value = this.total
-    this.$ele.text(this.value)
-}
-
-// 将数值减1直到0，如果值变为0则调用回调函数
-Label.prototype.decrease = function(){
-    if(this.value > 0){
-        this.value--
-        this.$ele.text(this.value)
-    }
-    // typeof x == 'function' 用来判断x是否为函数
-    if(Label.Config.autoNext && this.value == 0 && $.isFunction(this.complete)){
-        // 调用2次是为了改善动画带来的延迟
-        // 第1次是动画开始前调用
-        this.complete(this, true)
-        
-        // 第2次是动画完成后调用
-        setTimeout(function() {
-            this.complete(this)
-        }.bind(this), 1500);
-    }
+// 更新数字 即点击正确后+1
+Label.prototype.increaseCnt = function(){
+    this.$ele.html('累计已找出 <b style="color: rgb(94,43,170); font-size: 26px"> ' + (++this.cnt) + ' </b> 处不同！')
 }
