@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Around;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,7 +90,9 @@ public class RecordService {
                 }
 
                 //关卡  P排序过的
-                List<Integer> sortedGameSceneDataIds = gameSceneDataDao.getAllByGameId(gameId).stream().map(GameSceneData::getId).collect(Collectors.toList());
+                List<Integer> sortedGameSceneDataIds = gameSceneDataDao.getAllByGameId(gameId).stream()
+                        .map(GameSceneData::getId)
+                        .filter(id -> !CollectionUtils.isEmpty(roomMap.get(roomNum).get(id))).collect(Collectors.toList());
                 for (Integer gameSceneDataId : sortedGameSceneDataIds) {//遍历关卡
                     List<Record> recordsGroupByGameScene = roomMap.get(roomNum).get(gameSceneDataId);//获取房间中某关卡的所有记录
                     Map<String, String> tBodyMap = new LinkedHashMap<>();
