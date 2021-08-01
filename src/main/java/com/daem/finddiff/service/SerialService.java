@@ -7,6 +7,7 @@ import com.daem.finddiff.entity.Serial;
 import com.daem.finddiff.dao.SerialDao;
 import com.daem.finddiff.entity.SerialStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,7 +82,7 @@ public class SerialService {
 
     public ResponseResult<List<Serial>> getSerials() {
         try {
-            List<Serial> all = serialDao.findAll();
+            List<Serial> all = serialDao.findAll(new Sort(Sort.Direction.DESC, "createTime"));
             return ResponseResult.defSuccessful(all);
         } catch (Exception e) {
             return ResponseResult.defFailed("数据异常！", e.getMessage());

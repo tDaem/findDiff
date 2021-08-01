@@ -8,7 +8,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     #    url: jdbc:mysql://167.179.106.197/demo?userUnicode=true&characterEncodeing=utf-8&useSSL=false&serverTimezone=UTC
-    url: jdbc:mysql://localhost/zhaocha?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/zhaocha?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     #    url: jdbc:mysql://tcq-19961020.mysql.rds.aliyuncs.com/zhaocha?userUnicode=true&characterEncodeing=utf-8&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456

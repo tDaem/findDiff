@@ -63,6 +63,7 @@ GameScene.prototype.initGame = function (prevScene) {
     this.confirmBtn = new ConfirmButton(this.game.box, {})
     // this.secondManager = new SecondManager(this.game.box, this.data.seconds)
     this.label = new Label(this.game.box, 0, {})
+    this.tipLabel = new TipLabel(this.game.box, 0, {})
 
     this.skipBtn.setOnClickListener(this.skip.bind(this))//this指向当前场景
     this.confirmBtn.setOnClickListener(this.sendConfirmClick.bind(this)) //this指向当前场景
@@ -71,6 +72,7 @@ GameScene.prototype.initGame = function (prevScene) {
     this.skipBtn.show()
     this.confirmBtn.show()
     this.label.show()
+    this.tipLabel.show()
     if (this.data.structure === 'UP_AND_DOWN') {
         $(this.game.box).css(this.game.UD)
         console.log(this.skipBtn)

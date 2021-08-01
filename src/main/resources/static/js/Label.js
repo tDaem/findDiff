@@ -6,7 +6,7 @@ function Label(box, options){
     
     this.options = {
         position: 'absolute',
-        left: '300px',
+        left: '0px',
         bottom: '502px',
         fontSize: '20px',
         display: 'inline-block',
